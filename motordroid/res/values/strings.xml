@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MotorDroid</string>
+    
+    <string name="menu_conexion">Conectar</string>
+    <string name="menu_desconexion">Desconectar</string>
+    
+    <string name="modo_manual">Modo\nManual</string>
+    <string name="modo_volante">Modo\nVolante</string>
+    <string name="modo_explorador">Modo\nExplorador</string>
+    <string name="modo_circuito">Modo\nCircuito</string>
+
+</resources>
