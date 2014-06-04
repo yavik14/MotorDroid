@@ -16,7 +16,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/modo_man"
+            android:background="@drawable/modo_man_sel"
+            android:checked="true"
             android:textOff=""
             android:textOn="" />
 
@@ -47,6 +48,11 @@
             android:textOn=""
             android:background="@drawable/modo_cir" />
     </LinearLayout>
+    
+    <View
+             android:layout_width="fill_parent"
+             android:layout_height="2dp"
+             android:background="@color/motordroid"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -74,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:text="L" />
+                    android:background="@drawable/dir_izquierda"/>
 
                 <Button
                     android:id="@+id/giroDerecha"
@@ -82,8 +88,11 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:text="R" />
+                    android:background="@drawable/dir_derecha" />
+                	
             </LinearLayout>
+            
+                    
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -112,12 +121,17 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
+        
+		<View
+             android:layout_width="2dp"
+             android:layout_height="fill_parent"
+             android:background="@color/motordroid"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/motordroid"
+            android:background="#202020"
             android:orientation="vertical" >
 
             <LinearLayout
@@ -135,8 +149,10 @@
                     android:layout_marginTop="14dp"
                     android:textOff=""
                     android:textOn=""
-                    android:background="@drawable/led_faro_azul" />
+                    android:background="@drawable/luz_azul" />
             </LinearLayout>
+            
+            
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -144,19 +160,25 @@
                 android:layout_weight="1"
                 android:orientation="horizontal" >
 
-                <Button
+                <ToggleButton
+                    android:id="@+id/int_izquierdo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:text="II" />
+                    android:textOff=""
+                    android:textOn=""
+                    android:background="@drawable/int_izquierdo_blanco" />
 
-                <Button
+                <ToggleButton
+                    android:id="@+id/int_derecho"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:text="ID" />
+                    android:textOff=""
+                    android:textOn=""
+                    android:background="@drawable/int_derecho_blanco" />
             </LinearLayout>
 
             <LinearLayout
@@ -166,14 +188,22 @@
                 android:layout_weight="1"
                 android:orientation="vertical" >
 
-                <Button
+                <ToggleButton
+                    android:id="@+id/triangulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="S" />
+                    android:textOff=""
+                    android:textOn=""
+                    android:background="@drawable/triangulo_blanco"  />
             </LinearLayout>
         </LinearLayout>
 
+        <View
+             android:layout_width="2dp"
+             android:layout_height="fill_parent"
+             android:background="@color/motordroid"/>
+        
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -188,7 +218,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text="A" />
+                android:background="@drawable/dir_adelante"/>
 
             <Button
                 android:id="@+id/marchaAtras"
@@ -196,7 +226,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text="B" />
+                android:background="@drawable/dir_atras" />
         </LinearLayout>
     </LinearLayout>
 

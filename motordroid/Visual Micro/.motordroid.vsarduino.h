@@ -41,22 +41,25 @@ extern "C" void __cxa_pure_virtual() {;}
 //
 //
 void cambioModo(char com);
-void acelerar();
-void giroIzquierda();
-void giroDer();
+void frenar();
+void luces();
 void parpadeoLedIZQ();
 void parpadeoLedDER();
 void parpadeoLedCEN();
-void luces();
-void frenar(int pinNum);
-void marchaAtras(int pinNum);
+void acelerar();
+void marchaAtras();
+void giroIzquierda();
+void giroDer();
+int compruebaLineaDerecha();
+int compruebaLineaIzquierda();
+void sigueLinea();
+void lineaIzquierda();
+void lineaDerecha();
 void testMotores();
 void testMotoresDC();
 void parpadeoLeds();
 void movimientoServo();
 float medirDistancia();
-int compruebaLineaDerecha();
-int compruebaLineaIzquierda();
 
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\cores\arduino\arduino.h"
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\variants\mega\pins_arduino.h" 

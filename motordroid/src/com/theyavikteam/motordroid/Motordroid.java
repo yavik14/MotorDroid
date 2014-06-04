@@ -1,8 +1,6 @@
 package com.theyavikteam.motordroid;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -40,7 +38,7 @@ public class Motordroid extends Activity implements SensorEventListener {
 	public char comandoAcelY;
 
 	// Debugging
-	public static final String TAG = "LEDv0";
+	public static final String TAG = "MotorDroid";
 	public static final boolean D = true;
 	// Tipos de mensaje enviados y recibidos desde el Handler de ConexionBT
 	public static final int Mensaje_Estado_Cambiado = 1;
@@ -71,119 +69,237 @@ public class Motordroid extends Activity implements SensorEventListener {
 	public boolean modo2 = false;
 	public boolean modo3 = false;
 	public boolean modo4 = false;
+	
+	public ToggleButton botonIntermitenteDerecho;
+	public ToggleButton botonIntermitenteIzquierdo;
 
+	private ToggleButton botonManual;
+	private ToggleButton botonVolante;
+	private ToggleButton botonExplorador;
+	private ToggleButton botonCircuito;
+
+	private ToggleButton botonLed;
+	private ToggleButton botonTriangulo;
+	public Button botonAtras;
+	public Button botonDer;
+	public Button botonIzq;
+	public Button botonAdelante;
+	
+	//CONTROL DEL MENU PRINCIPAL Y MODOS DE FUNCIONAMIENTO
+	public void controlMenu(View v){
+		if(v == botonManual){
+			if (D)Log.e("Boton Manual", "Modo Manual Activo");
+			if(seleccionador){
+				sendMessage("1\r");
+			}
+			Toast.makeText(getApplicationContext(),	"Modo Manual Seleccionado" , Toast.LENGTH_SHORT).show();
+			findViewById(R.id.modo1).setBackgroundResource(R.drawable.modo_man_sel);
+			modo1 = true;
+			modo2 = false;
+			modo3 = false;
+			modo4 = false;
+			findViewById(R.id.modo2).setBackgroundResource(R.drawable.modo_vol);
+			findViewById(R.id.modo3).setBackgroundResource(R.drawable.modo_exp);
+			findViewById(R.id.modo4).setBackgroundResource(R.drawable.modo_cir);
+			botonVolante.setChecked(false);
+			botonExplorador.setChecked(false);
+			botonCircuito.setChecked(false);
+		}else if(v == botonVolante){
+			if (D)Log.e("Boton Volante", "Modo Volante Activo");
+			if(seleccionador){
+				sendMessage("2\r");
+			}
+			Toast.makeText(getApplicationContext(),	"Modo Volante Seleccionado" , Toast.LENGTH_SHORT).show();
+			findViewById(R.id.modo2).setBackgroundResource(R.drawable.modo_vol_sel);
+			modo1 = false;
+			modo2 = true;
+			modo3 = false;
+			modo4 = false;
+			findViewById(R.id.modo1).setBackgroundResource(R.drawable.modo_man);
+			findViewById(R.id.modo3).setBackgroundResource(R.drawable.modo_exp);
+			findViewById(R.id.modo4).setBackgroundResource(R.drawable.modo_cir);
+			botonManual.setChecked(false);
+			botonExplorador.setChecked(false);
+			botonCircuito.setChecked(false);
+		}else if(v == botonExplorador){
+			if (D)Log.e("Boton Explorador", "Modo Explorador Activo");
+			if(seleccionador){
+				sendMessage("3\r");
+			}
+			Toast.makeText(getApplicationContext(),	"Modo Explorador Seleccionado" , Toast.LENGTH_SHORT).show();
+			findViewById(R.id.modo3).setBackgroundResource(R.drawable.modo_exp_sel);
+			modo1 = false;
+			modo2 = false;
+			modo3 = true;
+			modo4 = false;
+			findViewById(R.id.modo1).setBackgroundResource(R.drawable.modo_man);
+			findViewById(R.id.modo2).setBackgroundResource(R.drawable.modo_vol);
+			findViewById(R.id.modo4).setBackgroundResource(R.drawable.modo_cir);
+			botonManual.setChecked(false);
+			botonVolante.setChecked(false);
+			botonCircuito.setChecked(false);
+		}else if(v == botonCircuito){
+			if (D)Log.e("Boton Circuito", "Modo Circuito Activo");
+			if(seleccionador){
+				sendMessage("4\r");
+			}
+			Toast.makeText(getApplicationContext(),	"Modo Circuito Seleccionado" , Toast.LENGTH_SHORT).show();
+			findViewById(R.id.modo4).setBackgroundResource(R.drawable.modo_cir_sel);
+			modo1 = false;
+			modo2 = false;
+			modo3 = false;
+			modo4 = true;
+			findViewById(R.id.modo1).setBackgroundResource(R.drawable.modo_man);
+			findViewById(R.id.modo2).setBackgroundResource(R.drawable.modo_vol);
+			findViewById(R.id.modo3).setBackgroundResource(R.drawable.modo_exp);
+			botonManual.setChecked(false);
+			botonVolante.setChecked(false);
+			botonExplorador.setChecked(false);
+		}
+		
+	}
+	
+
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_motordroid);
 		
 		setTitle("");
-
-		final ToggleButton botonLed = (ToggleButton) findViewById(R.id.luces);
-		botonLed.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View vv) {
-				if (botonLed.isChecked()) {
-					if (D)Log.e("BotonLed", "Encendiendo..");
-					sendMessage("W\r");
-					findViewById(R.id.luces).setBackgroundResource(R.drawable.led_faro_blanco);
-				} else {
-					if (D)Log.e("BotonLed", "Apagando..");
-					sendMessage("W\r");
-					findViewById(R.id.luces).setBackgroundResource(R.drawable.led_faro_azul);
-				}
-			}
-		});
-
-		final ToggleButton botonManual = (ToggleButton) findViewById(R.id.modo1);
+		
+		//habilitaBotones(false);
+		
+		//BOTONES DEL MENU PRINCIPAL
+		
+		botonManual = (ToggleButton) findViewById(R.id.modo1);
 		botonManual.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View vv) {
 				if (botonManual.isChecked()) {
-					modo1 = true;
-					if (D)Log.e("Boton Manual", "Modo Manual Activo");
-					findViewById(R.id.modo1).setBackgroundResource(R.drawable.modo_man_sel);
-
-				} else {
-					if (D)
-						Log.e("Boton Manual", "Modo Manual Inactivo");
-					modo1 = false;
-					findViewById(R.id.modo1).setBackgroundResource(R.drawable.modo_man);
+					controlMenu(botonManual);
 				}
 			}
 		});
 		
-		final ToggleButton botonVolante = (ToggleButton) findViewById(R.id.modo2);
+		botonVolante = (ToggleButton) findViewById(R.id.modo2);
 		botonVolante.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View vv) {
 				if (botonVolante.isChecked()) {
-					modo2 = true;
-					if (D)Log.e("Boton Volante", "Modo Volante Activo");
-					findViewById(R.id.modo2).setBackgroundResource(R.drawable.modo_vol_sel);
-
-				} else {
-					if (D)
-						Log.e("Boton Volante", "Modo Volante Inactivo");
-					modo2 = false;
-					findViewById(R.id.modo2).setBackgroundResource(R.drawable.modo_vol);
+					controlMenu(botonVolante);
 				}
 			}
 		});
 		
-		final ToggleButton botonExplorador = (ToggleButton) findViewById(R.id.modo3);
+		botonExplorador = (ToggleButton) findViewById(R.id.modo3);
 		botonExplorador.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View vv) {
 				if (botonExplorador.isChecked()) {
-					modo3 = true;
-					if (D)Log.e("Boton Explorador", "Modo Explorador Activo");
-					findViewById(R.id.modo3).setBackgroundResource(R.drawable.modo_exp_sel);
-
-				} else {
-					if (D)
-						Log.e("Boton Explorador", "Modo Explorador Inactivo");
-					modo3 = false;
-					findViewById(R.id.modo3).setBackgroundResource(R.drawable.modo_exp);
+					controlMenu(botonExplorador);
 				}
 			}
 		});
 		
-		final ToggleButton botonCircuito = (ToggleButton) findViewById(R.id.modo4);
+		botonCircuito = (ToggleButton) findViewById(R.id.modo4);
 		botonCircuito.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View vv) {
 				if (botonCircuito.isChecked()) {
-					modo4 = true;
-					if (D)Log.e("Boton Circuito", "Modo Circuito Activo");
-					findViewById(R.id.modo4).setBackgroundResource(R.drawable.modo_cir_sel);
+					controlMenu(botonCircuito);
+				}
+			}
+		});
+		
 
+		
+		//BOTONES DE LEDS
+
+		botonLed = (ToggleButton) findViewById(R.id.luces);
+		botonLed.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonLed.isChecked()) {
+					if (D)Log.e("BotonLed", "Luz Blanca");
+					sendMessage("W\r");
+					findViewById(R.id.luces).setBackgroundResource(R.drawable.luz_blanca);
 				} else {
-					if (D)
-						Log.e("Boton Circuito", "Modo Circuito Inactivo");
-					modo4 = false;
-					findViewById(R.id.modo4).setBackgroundResource(R.drawable.modo_cir);
+					if (D)Log.e("BotonLed", "Luz Azul");
+					sendMessage("W\r");
+					findViewById(R.id.luces).setBackgroundResource(R.drawable.luz_azul);
+				}
+			}
+		});
+		
+		botonTriangulo = (ToggleButton) findViewById(R.id.triangulo);
+		botonTriangulo.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonTriangulo.isChecked()) {
+					if (D)Log.e("BotonTriangulo", "Encendiendo..");
+					sendMessage("E\r");
+					findViewById(R.id.triangulo).setBackgroundResource(R.drawable.triangulo_naranja);
+					botonIntermitenteDerecho.setChecked(false);
+					botonIntermitenteDerecho.setEnabled(false);
+					findViewById(R.id.int_derecho).setBackgroundResource(R.drawable.int_derecho_blanco);
+					botonIntermitenteIzquierdo.setChecked(false);
+					botonIntermitenteIzquierdo.setEnabled(false);
+					findViewById(R.id.int_izquierdo).setBackgroundResource(R.drawable.int_izquierdo_blanco);
+					
+				} else {
+					if (D)Log.e("BotonTriangulo", "Apagando..");
+					sendMessage("E\r");
+					findViewById(R.id.triangulo).setBackgroundResource(R.drawable.triangulo_blanco);
+					botonIntermitenteIzquierdo.setEnabled(true);
+					botonIntermitenteDerecho.setEnabled(true);
+				}
+			}
+		});
+		
+		botonIntermitenteIzquierdo = (ToggleButton) findViewById(R.id.int_izquierdo);
+		botonIntermitenteIzquierdo.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonIntermitenteIzquierdo.isChecked()) {
+					if (D)Log.e("botonIntermitenteIzquierdo", "Encendiendo..");
+					sendMessage("I\r");
+					findViewById(R.id.int_izquierdo).setBackgroundResource(R.drawable.int_izquierdo_naranja);
+					botonIntermitenteDerecho.setChecked(false);
+					findViewById(R.id.int_derecho).setBackgroundResource(R.drawable.int_derecho_blanco);
+				} else {
+					if (D)Log.e("botonIntermitenteIzquierdo", "Apagando..");
+					sendMessage("I\r");
+					findViewById(R.id.int_izquierdo).setBackgroundResource(R.drawable.int_izquierdo_blanco);
+				}
+			}
+		});
+		
+		
+		botonIntermitenteDerecho = (ToggleButton) findViewById(R.id.int_derecho);
+		botonIntermitenteDerecho.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonIntermitenteDerecho.isChecked()) {
+					if (D)Log.e("botonIntermitenteDerecho", "Encendiendo..");
+					sendMessage("D\r");
+					findViewById(R.id.int_derecho).setBackgroundResource(R.drawable.int_derecho_naranja);
+					botonIntermitenteIzquierdo.setChecked(false);
+					findViewById(R.id.int_izquierdo).setBackgroundResource(R.drawable.int_izquierdo_blanco);
+				} else {
+					if (D)Log.e("botonIntermitenteDerecho", "Apagando..");
+					sendMessage("D\r");
+					findViewById(R.id.int_derecho).setBackgroundResource(R.drawable.int_derecho_blanco);
 				}
 			}
 		});
 
-		Button BotonAtras = (Button) findViewById(R.id.marchaAtras);
-		BotonAtras.setOnTouchListener(new View.OnTouchListener() {
-			long timePulsar = 0;
-			long timeSoltar = 0;
-			long timeDiferencia = 0;
+		//BOTONES DE DIRECCION
 
+		botonAtras = (Button) findViewById(R.id.marchaAtras);
+		botonAtras.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					timePulsar = System.currentTimeMillis();
+					sendMessage("B\r");
 					Log.d("Pressed", "Button B pressed");
 					atrasPulsado = true;
 
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
-					timeSoltar = System.currentTimeMillis();
+					sendMessage("F\r");
 					atrasPulsado = false;
 					Log.d("Released", "Button B released");
-					timeDiferencia = timeSoltar - timePulsar;
-					Log.d("Tiempo", Long.toString(timeDiferencia));
-					while (timeDiferencia > 0) {
-						timeDiferencia -= 100;
-						sendMessage("F\r");
-					}
 				}
 
 				// TODO Auto-generated method stub
@@ -191,30 +307,18 @@ public class Motordroid extends Activity implements SensorEventListener {
 			}
 		});
 
-		Button BotonDer = (Button) findViewById(R.id.giroDerecha);
-		BotonDer.setOnTouchListener(new View.OnTouchListener() {
+		botonDer = (Button) findViewById(R.id.giroDerecha);
+		botonDer.setOnTouchListener(new View.OnTouchListener() {
 
 			public boolean onTouch(View v, MotionEvent event) {
-				// Dentro de 0 milisegundos avísame cada 1000 milisegundos
-				TimerTask timerTaskD = new TimerTask() {
-					public void run() {
-						if (derPulsado == true) {
-							sendMessage("R\r");
-						}
-						// Aquí el código que queremos ejecutar.
-					}
-				};
-
-				// Aquí se pone en marcha el timer cada segundo.
-				Timer timerd = new Timer();
-				timerd.schedule(timerTaskD, 0, 1500);
-				// timerd.scheduleAtFixedRate(timerTaskD, 0, 3000);
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					Log.d("Pressed", "Button R pressed");
 					derPulsado = true;
+					sendMessage("R\r");
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
 					derPulsado = false;
 					Log.d("Released", "Button R released");
+					sendMessage("F\r");
 				}
 
 				// TODO Auto-generated method stub
@@ -222,30 +326,18 @@ public class Motordroid extends Activity implements SensorEventListener {
 			}
 		});
 
-		final Button BotonIzq = (Button) findViewById(R.id.giroIzquierda);
-		BotonIzq.setOnTouchListener(new View.OnTouchListener() {
+		botonIzq = (Button) findViewById(R.id.giroIzquierda);
+		botonIzq.setOnTouchListener(new View.OnTouchListener() {
 
 			public boolean onTouch(View v, MotionEvent event) {
-				// Dentro de 0 milisegundos avísame cada 1000 milisegundos
-				TimerTask timerTaskI = new TimerTask() {
-					public void run() {
-						if (izqPulsado == true) {
-							sendMessage("L\r");
-						}
-						// Aquí el código que queremos ejecutar.
-					}
-				};
-
-				// Aquí se pone en marcha el timer cada segundo.
-				Timer timeri = new Timer();
-				timeri.schedule(timerTaskI, 0, 1500);
-				//timeri.scheduleAtFixedRate(timerTaskI, 0, 700);
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					Log.d("Pressed", "Button L pressed");
 					izqPulsado = true;
+					sendMessage("L\r");
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
 					izqPulsado = false;
 					Log.d("Released", "Button L released");
+					sendMessage("F\r");
 				}
 
 				// TODO Auto-generated method stub
@@ -253,36 +345,46 @@ public class Motordroid extends Activity implements SensorEventListener {
 			}
 		});
 
-		final Button BotonAdelante = (Button) findViewById(R.id.acelera);
-		BotonAdelante.setOnTouchListener(new View.OnTouchListener() {
+		botonAdelante = (Button) findViewById(R.id.acelera);
+		botonAdelante.setOnTouchListener(new View.OnTouchListener() {
 
 			public boolean onTouch(View v, MotionEvent event) {
-				// Dentro de 0 milisegundos avísame cada 1000 milisegundos
-				TimerTask timerTaskF = new TimerTask() {
-					public void run() {
-						if (adelantePulsado == true) {
-							sendMessage("A\r");
-						}
-						// Aquí el código que queremos ejecutar.
-					}
-				};
-
-				// Aquí se pone en marcha el timer cada segundo.
-				Timer timerf = new Timer();
-				timerf.schedule(timerTaskF, 0, 1500);
-				//timera.scheduleAtFixedRate(timerTaskA, 0, 700);
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					Log.d("Pressed", "Button A pressed");
 					adelantePulsado = true;
+					sendMessage("A\r");
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
 					adelantePulsado = false;
 					Log.d("Released", "Button A released");
+					sendMessage("F\r");
 				}
 
 				// TODO Auto-generated method stub
 				return false;
 			}
 		});
+	}
+	
+	public void habilitaBotones(boolean b){
+		if(b){
+			botonLed.setEnabled(true);
+			botonAdelante.setEnabled(true);
+			botonAtras.setEnabled(true);
+			botonDer.setEnabled(true);
+			botonIzq.setEnabled(true);
+			botonIntermitenteDerecho.setEnabled(true);
+			botonIntermitenteIzquierdo.setEnabled(true);
+			botonTriangulo.setEnabled(true);
+		}else{
+			botonLed.setEnabled(false);
+			botonAdelante.setEnabled(false);
+			botonAtras.setEnabled(false);
+			botonDer.setEnabled(false);
+			botonIzq.setEnabled(false);
+			botonIntermitenteDerecho.setEnabled(false);
+			botonIntermitenteIzquierdo.setEnabled(false);
+			botonTriangulo.setEnabled(false);
+		}
 	}
 
 	public void onStart() {
@@ -405,6 +507,7 @@ public class Motordroid extends Activity implements SensorEventListener {
 						"Conectado con " + mConnectedDeviceName,
 						Toast.LENGTH_SHORT).show();
 				seleccionador = true;
+				habilitaBotones(seleccionador);
 				break;
 			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			case Mensaje_TOAST:
@@ -417,6 +520,7 @@ public class Motordroid extends Activity implements SensorEventListener {
 				if (D)
 					Log.e("Conexion", "DESConectados");
 				seleccionador = false;
+				habilitaBotones(seleccionador);
 				break;
 			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			}// FIN DE SWITCH CASE PRIMARIO DEL HANDLER

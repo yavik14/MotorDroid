@@ -157,6 +157,8 @@ void loop() {
   //testMotores();
   //testMotoresDC();
   //movimientoServo();
+
+	
   if (modo == 1){
     //Esperamos a recibir datos
     if(Serial3.available()){
@@ -168,7 +170,10 @@ void loop() {
       Serial3.flush();
       //Mostramos por Serial el comando llegado
       Serial.println(comando);
-      //Si nos llega un comando para cambiar de modo
+
+      }
+      
+	  //Si nos llega un comando para cambiar de modo
       cambioModo(comando);
       //Si pulsamos click encenderemos o apagaremos el led amarillo
       if (comando == 'W'){
@@ -177,11 +182,20 @@ void loop() {
       }
       else if (comando == 'F'){
         //Serial.println("Encendemos luz Roja");
-        frenar(ledRojo);
+        frenar();
+      }
+	  else if (comando == 'A'){
+        acelerar();
+      }
+      else if (comando == 'L'){
+        giroIzquierda();
+      }
+      else if (comando == 'R'){
+        giroDer();
       }
       else if (comando == 'B'){
         //Serial.println("Encendemos luz Roja");
-        marchaAtras(ledAtras);
+        marchaAtras();
       }
       else if (comando == 'E'){
         //Serial.println("Encendemos luz Roja");
@@ -198,28 +212,9 @@ void loop() {
         pulsacionesIzq += 1;
         Serial.println(pulsacionesIzq);
       }
-      else if (comando == 'A'){
-        acelerar();
-      }
-      else if (comando == 'L'){
-        giroIzquierda();
-      }
-      else if (comando == 'R'){
-        giroDer();
-      }
+      
   
       Serial3.flush();
-      }
-      else{
-         digitalWrite(ledRojo, LOW);
-         digitalWrite(ledAtras, LOW);
-         motor1.setSpeed(0);
-         motor2.setSpeed(0);
-         motor3.setSpeed(0);
-         motor4.setSpeed(0);
-         servomotor.write(38);
-      }
-      
     //Si pulsamos el estacionador reinicia los contadores de los intermitentes  
     if((pulsacionesCen%2) == 1){
           pulsacionesIzq = 0;
@@ -294,7 +289,7 @@ void loop() {
             giroDer();   
           }
         }else if (distancia <= 0.3){   
-              marchaAtras(ledAtras);   
+              marchaAtras();   
         } 
       }
   
@@ -321,18 +316,18 @@ void loop() {
       Serial.println(sensorDer);
       //Si los dos sensores leen la linea, aceleramos
       if(sensorIzq == 1 && sensorDer == 1){
-        acelerar();
+		sigueLinea();
         tiempoPrevioLinea = 0;
         tiempoActualLinea = 0;
       //Si solo el sensor izquierdo lee la linea, giramos izquierda
       }else if(sensorIzq == 1 && sensorDer == 0){
-        giroIzquierda();
+		lineaIzquierda();
         ultimaLinea = 1;
         tiempoPrevioLinea = 0;
         tiempoActualLinea = 0;
       //Si solo el sensor derecho lee la linea, giramos derecha
       }else if(sensorIzq == 0 && sensorDer == 1){
-        giroDer();
+		lineaDerecha();
         ultimaLinea = 2;
         tiempoPrevioLinea = 0;
         tiempoActualLinea = 0;
@@ -348,14 +343,11 @@ void loop() {
         Serial.print(" = ");
         Serial.println(tiempoActualLinea-tiempoPrevioLinea);
         if(tiempoActualLinea - tiempoPrevioLinea >= intervaloLinea){
-          motor1.setSpeed(0);
-          motor2.setSpeed(0);
-          motor3.setSpeed(0);
-          motor4.setSpeed(0);
+          frenar();
         }else if(ultimaLinea = 1){
-          giroIzquierda();
+		  lineaIzquierda();
         }else if(ultimaLinea = 2){
-          giroDer();          
+		  lineaIzquierda();
         } 
       }
   }
@@ -371,65 +363,50 @@ void loop() {
 
 //Funcion para cambiar de Modo de funcionamiento
 void cambioModo(char com){
-  //MODO BT BASICO
+  //MODO MANUAL
   if (com == '1'){
     modo = com - '0';
-  //MODO BT ACELEROMETRO
+	frenar();
+	delay(1000);
+  //MODO VOLANTE
   }else if (com == '2'){
     modo = com - '0';
-  //MODO AUTOMATICO
+	frenar();
+	delay(1000);
+  //MODO EXPLORADOR
   }else if (com == '3'){
     modo = com - '0';
+	frenar();
+	delay(1000);
   //MODO CIRCUITO
   }else if (com == '4'){
     modo = com - '0';
+	frenar();
+	delay(1000);
   }
 }
 
 
+//ACCIONES COMPARTIDAS ENTRE ALGUNOS MODOS
 
-
-
-
-
-
-
-
-
-void acelerar(){
-  velocidad = 255;
-  motor1.setSpeed(velocidad);
-  motor2.setSpeed(velocidad);
-  motor3.setSpeed(velocidad);
-  motor4.setSpeed(velocidad);
-  motor1.run(FORWARD);
-  motor2.run(BACKWARD);
-  motor3.run(FORWARD);
-  motor4.run(BACKWARD);
+//Funcion frenar, para el coche
+void frenar(){
+  digitalWrite(ledRojo, HIGH);
+  digitalWrite(ledAtras, LOW);
+  motor1.setSpeed(0);
+  motor2.setSpeed(0);
+  motor3.setSpeed(0);
+  motor4.setSpeed(0);
 }
 
-void giroIzquierda(){
-  //servomotor.write(85); 
-  motor1.setSpeed(100);
-  motor2.setSpeed(velocidad);
-  motor3.setSpeed(velocidad);
-  motor4.setSpeed(100);
-  motor1.run(RELEASE);
-  motor2.run(BACKWARD);
-  motor3.run(FORWARD);
-  motor4.run(RELEASE);
-}
-
-void giroDer(){
-  //servomotor.write(115); 
-  motor1.setSpeed(velocidad);
-  motor2.setSpeed(100);
-  motor3.setSpeed(100);
-  motor4.setSpeed(velocidad);
-  motor1.run(FORWARD);
-  motor2.run(RELEASE);
-  motor3.run(RELEASE);
-  motor4.run(BACKWARD);
+//Funcion que cambia el estado de las luces delanteras
+void luces(){
+  //Si el estado era 0 lo cambia a 1, y viceversa
+  azuEstado = !azuEstado;
+  blaEstado = !blaEstado;
+  //Establece  el estado de los pines con sus respectivos estados
+  digitalWrite(ledAzul, azuEstado);
+  digitalWrite(ledBlanco, blaEstado);
 }
 
 //Funcion parpadeo de led izquierdo
@@ -490,24 +467,27 @@ void parpadeoLedCEN(){
     digitalWrite(ledIzq, izqEstado);
 }
 
-//Funcion que cambia el estado de las luces delanteras
-void luces(){
-  //Si el estado era 0 lo cambia a 1, y viceversa
-  azuEstado = !azuEstado;
-  blaEstado = !blaEstado;
-  //Establece  el estado de los pines con sus respectivos estados
-  digitalWrite(ledAzul, azuEstado);
-  digitalWrite(ledBlanco, blaEstado);
+
+//ACCIONES MODO MANUAL
+
+void acelerar(){
+  digitalWrite(ledAtras, LOW);
+  digitalWrite(ledRojo, LOW);
+  velocidad = 255;
+  motor1.setSpeed(velocidad);
+  motor2.setSpeed(velocidad);
+  motor3.setSpeed(velocidad);
+  motor4.setSpeed(velocidad);
+  motor1.run(FORWARD);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
+  motor4.run(BACKWARD);
 }
 
-//Funcion pulsado
-void frenar(int pinNum){
-  digitalWrite(pinNum, HIGH);
-}
-
-//Funcion pulsado
-void marchaAtras(int pinNum){
-  digitalWrite(pinNum, HIGH);
+//Retrocede
+void marchaAtras(){
+  digitalWrite(ledAtras, HIGH);
+  digitalWrite(ledRojo, LOW);
   velocidad = 180;
   motor1.setSpeed(velocidad);
   motor2.setSpeed(velocidad);
@@ -517,6 +497,106 @@ void marchaAtras(int pinNum){
   motor2.run(FORWARD);
   motor3.run(BACKWARD);
   motor4.run(FORWARD);}
+
+//Gira hacia la izquierda
+void giroIzquierda(){
+  digitalWrite(ledAtras, LOW);
+  digitalWrite(ledRojo, LOW);
+  motor1.setSpeed(0);
+  motor2.setSpeed(velocidad);
+  motor3.setSpeed(velocidad);
+  motor4.setSpeed(0);
+  motor1.run(RELEASE);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
+  motor4.run(RELEASE);
+}
+
+//Gira hacia la derecha
+void giroDer(){
+  digitalWrite(ledAtras, LOW);
+  digitalWrite(ledRojo, LOW);
+  motor1.setSpeed(velocidad);
+  motor2.setSpeed(0);
+  motor3.setSpeed(0);
+  motor4.setSpeed(velocidad);
+  motor1.run(FORWARD);
+  motor2.run(RELEASE);
+  motor3.run(RELEASE);
+  motor4.run(BACKWARD);
+}
+
+//ACCIONES MODO CIRCUITO
+
+//Funciones que leen los sensores y crean señales digitales para su uso. Nota que cada sensor funciona al contrario que el otro.
+int compruebaLineaDerecha(){
+  int res1;
+  //Hacemos la lectura analogica del sensor
+  int aux1 = analogRead(lineDer);
+  //Si el valor es mayor que 700, en este caso el sensor captura la linea blanca, valor 1
+  if(aux1 > 700){
+    res1 = 1;
+  //Si no es la linea blanca, valor 0
+  }else{
+    res1 = 0;
+  }
+  //Devolvemos el resultado
+  return res1;
+}
+
+//Analogo al anterior metodo, salvo que la condicion es que el valor leido del sensor debe de ser menor que 200 para ser linea blanca lo capturado
+int compruebaLineaIzquierda(){
+  int res2;
+  int aux2 = analogRead(lineIzq);
+  if(aux2 < 200){
+    res2 = 1;
+  }else{
+    res2 = 0;
+  }
+  return res2;
+}
+
+void sigueLinea(){
+  digitalWrite(ledAtras, LOW);
+  digitalWrite(ledRojo, LOW);
+  velocidad = 100;
+  motor1.setSpeed(velocidad);
+  motor2.setSpeed(velocidad);
+  motor3.setSpeed(velocidad);
+  motor4.setSpeed(velocidad);
+  motor1.run(FORWARD);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
+  motor4.run(BACKWARD);
+}
+
+void lineaIzquierda(){
+  digitalWrite(ledAtras, LOW);
+  digitalWrite(ledRojo, LOW);
+  motor1.setSpeed(velocidad);
+  motor2.setSpeed(velocidad);
+  motor3.setSpeed(velocidad);
+  motor4.setSpeed(velocidad);
+  motor1.run(RELEASE);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
+  motor4.run(RELEASE);
+}
+
+void lineaDerecha(){
+  digitalWrite(ledAtras, LOW);
+  digitalWrite(ledRojo, LOW);
+  motor1.setSpeed(velocidad);
+  motor2.setSpeed(velocidad);
+  motor3.setSpeed(velocidad);
+  motor4.setSpeed(velocidad);
+  motor1.run(FORWARD);
+  motor2.run(RELEASE);
+  motor3.run(RELEASE);
+  motor4.run(BACKWARD);
+}
+
+//FUNCIONES DE TESTEO
 
 //Funcion test motores
 void testMotores(){
@@ -657,29 +737,4 @@ float medirDistancia(){
   return res;
 }
 
-//Funciones que leen los sensores y crean señales digitales para su uso. Nota que cada sensor funciona al contrario que el otro.
-int compruebaLineaDerecha(){
-  int res1;
-  //Hacemos la lectura analogica del sensor
-  int aux1 = analogRead(lineDer);
-  //Si el valor es mayor que 700, en este caso el sensor captura la linea blanca, valor 1
-  if(aux1 > 700){
-    res1 = 1;
-  //Si no es la linea blanca, valor 0
-  }else{
-    res1 = 0;
-  }
-  //Devolvemos el resultado
-  return res1;
-}
-//Analogo al anterior metodo, salvo que la condicion es que el valor leido del sensor debe de ser menor que 200 para ser linea blanca lo capturado
-int compruebaLineaIzquierda(){
-  int res2;
-  int aux2 = analogRead(lineIzq);
-  if(aux2 < 200){
-    res2 = 1;
-  }else{
-    res2 = 0;
-  }
-  return res2;
-}
+
