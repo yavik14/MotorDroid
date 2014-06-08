@@ -70,6 +70,9 @@ public class Motordroid extends Activity implements SensorEventListener {
 	public boolean modo3 = false;
 	public boolean modo4 = false;
 	
+	public boolean aFueEnviado = false;
+	public boolean aAhoraEnviodo = false;
+	
 	public ToggleButton botonIntermitenteDerecho;
 	public ToggleButton botonIntermitenteIzquierdo;
 
@@ -84,10 +87,41 @@ public class Motordroid extends Activity implements SensorEventListener {
 	public Button botonDer;
 	public Button botonIzq;
 	public Button botonAdelante;
+
+	public View vistaIModo1;
+	public View vistaIModo2;
+	public View vistaIModo3;
+	public View vistaIModo4;
+
 	
+	public View vistaDModo1;
+	public View vistaDModo2;
+	public View vistaDModo3;
+	public View vistaDModo4;
+
+	public View vistaCModo12;
+	public View vistaCModo4;
+
+	public ComandosAcelerometro ca = new ComandosAcelerometro();
+
+		
 	//CONTROL DEL MENU PRINCIPAL Y MODOS DE FUNCIONAMIENTO
 	public void controlMenu(View v){
 		if(v == botonManual){
+			vistaIModo1.setVisibility(View.VISIBLE);
+			vistaDModo1.setVisibility(View.VISIBLE);
+			vistaCModo12.setVisibility(View.VISIBLE);
+			
+			vistaIModo2.setVisibility(View.GONE);
+			vistaDModo2.setVisibility(View.GONE);
+			
+			vistaIModo3.setVisibility(View.GONE);
+			vistaDModo3.setVisibility(View.GONE);
+			
+			vistaIModo4.setVisibility(View.GONE);
+			vistaDModo4.setVisibility(View.GONE);
+			vistaCModo4.setVisibility(View.GONE);
+			
 			if (D)Log.e("Boton Manual", "Modo Manual Activo");
 			if(seleccionador){
 				sendMessage("1\r");
@@ -105,6 +139,20 @@ public class Motordroid extends Activity implements SensorEventListener {
 			botonExplorador.setChecked(false);
 			botonCircuito.setChecked(false);
 		}else if(v == botonVolante){
+			vistaIModo1.setVisibility(View.GONE);
+			vistaDModo1.setVisibility(View.GONE);
+			vistaCModo12.setVisibility(View.VISIBLE);
+			
+			vistaIModo2.setVisibility(View.VISIBLE);
+			vistaDModo2.setVisibility(View.VISIBLE);
+			
+			vistaIModo3.setVisibility(View.GONE);
+			vistaDModo3.setVisibility(View.GONE);
+			
+			vistaIModo4.setVisibility(View.GONE);
+			vistaDModo4.setVisibility(View.GONE);
+			vistaCModo4.setVisibility(View.GONE);
+			
 			if (D)Log.e("Boton Volante", "Modo Volante Activo");
 			if(seleccionador){
 				sendMessage("2\r");
@@ -122,6 +170,20 @@ public class Motordroid extends Activity implements SensorEventListener {
 			botonExplorador.setChecked(false);
 			botonCircuito.setChecked(false);
 		}else if(v == botonExplorador){
+			vistaIModo1.setVisibility(View.GONE);
+			vistaDModo1.setVisibility(View.GONE);
+			vistaCModo12.setVisibility(View.VISIBLE);
+			
+			vistaIModo2.setVisibility(View.GONE);
+			vistaDModo2.setVisibility(View.GONE);
+			
+			vistaIModo3.setVisibility(View.VISIBLE);
+			vistaDModo3.setVisibility(View.VISIBLE);
+			
+			vistaIModo4.setVisibility(View.GONE);
+			vistaDModo4.setVisibility(View.GONE);
+			vistaCModo4.setVisibility(View.GONE);
+			
 			if (D)Log.e("Boton Explorador", "Modo Explorador Activo");
 			if(seleccionador){
 				sendMessage("3\r");
@@ -139,6 +201,20 @@ public class Motordroid extends Activity implements SensorEventListener {
 			botonVolante.setChecked(false);
 			botonCircuito.setChecked(false);
 		}else if(v == botonCircuito){
+			vistaIModo1.setVisibility(View.GONE);
+			vistaDModo1.setVisibility(View.GONE);
+			vistaCModo12.setVisibility(View.GONE);
+			
+			vistaIModo2.setVisibility(View.GONE);
+			vistaDModo2.setVisibility(View.GONE);
+			
+			vistaIModo3.setVisibility(View.GONE);
+			vistaDModo3.setVisibility(View.GONE);
+			
+			vistaIModo4.setVisibility(View.VISIBLE);
+			vistaDModo4.setVisibility(View.VISIBLE);
+			vistaCModo4.setVisibility(View.VISIBLE);
+			
 			if (D)Log.e("Boton Circuito", "Modo Circuito Activo");
 			if(seleccionador){
 				sendMessage("4\r");
@@ -169,6 +245,19 @@ public class Motordroid extends Activity implements SensorEventListener {
 		setTitle("");
 		
 		//habilitaBotones(false);
+		
+		vistaIModo1 = findViewById(R.id.modo1Direcion);
+		vistaIModo2 = findViewById(R.id.modo2Direcion);
+		vistaIModo3 = findViewById(R.id.modo3Auto);
+		vistaIModo4 = findViewById(R.id.modo4Start);
+		
+		vistaDModo1 = findViewById(R.id.modo1Velocidad);
+		vistaDModo2 = findViewById(R.id.modo2Velocidad);
+		vistaDModo3 = findViewById(R.id.modo3Control);
+		vistaDModo4 = findViewById(R.id.modo4Stop);
+		
+		vistaCModo12 = findViewById(R.id.modo12Central);
+		vistaCModo4 = findViewById(R.id.modo4Central);
 		
 		//BOTONES DEL MENU PRINCIPAL
 		
@@ -561,46 +650,104 @@ public class Motordroid extends Activity implements SensorEventListener {
 		if (modo2) {
 			curX = event.values[0];
 			curY = event.values[1];
-			if (seleccionador) {
+			//if (seleccionador) {
 				comandoAcelX = comandoAcelerometroX(curX);
 				comandoAcelY = comandoAcelerometroY(curY);
-			}
-			((TextView) findViewById(R.id.X)).setText("X: " + curX);
+			//}
+			/*((TextView) findViewById(R.id.X)).setText("X: " + curX);
 			((TextView) findViewById(R.id.comandoX)).setText("Comando: "
 					+ comandoAcelX);
 			((TextView) findViewById(R.id.Y)).setText("Y: " + curY);
 			((TextView) findViewById(R.id.comandoY)).setText("Comando: "
-					+ comandoAcelY);
+					+ comandoAcelY);*/
+		}
+	}
+	
+	public void comandoDireccion(int i){
+		ca.inicializaLista(ca.comandosDireccionPulsados, 7);
+		ca.actualizaLista(ca.comandosDireccionFueronPulsados, i, 7);
+		ca.actualizaListaComando(ca.comandosDireccionPulsados, i, 7);
+		if (ca.comparaComando(ca.comandosDireccionPulsados, ca.comandosDireccionFueronPulsados, i)){
+			ca.actualizaListaComando(ca.comandosDireccionFueronPulsados, i, 7);
+			Log.e("ACELETOMETRO", "COMANDO: " + ca.comandosDireccion.get(i));
+			sendMessage(ca.comandosDireccion.get(i) + "\r");
 		}
 	}
 
 	public char comandoAcelerometroY(float valorY) {
 		char res = ' ';
-		if (valorY < -3.0) {
-			res = 'L';
-			sendMessage(res + "\r");
-			Log.d("Acelerometro", res + "\r");
+		
+		if (valorY < -6.7) {
+			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_izq_top);
+			comandoDireccion(0);
 		}
-		if (valorY > 3.0) {
-			res = 'R';
-			sendMessage(res + "\r");
-			Log.d("Acelerometro", res + "\r");
+		if (valorY < -3.2 && valorY > -6.5) {
+			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_izq_max);
+			comandoDireccion(1);
 		}
+		if (valorY < -1.7 && valorY > -3.0) {
+			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_izq_med);
+			comandoDireccion(2);
+		}
+		
+		if (valorY < 1.5 && valorY > -1.5) {
+			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_recto);
+			comandoDireccion(3);
+		}
+		if (valorY < 3.0 && valorY > 1.7) {
+			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_der_med);
+			comandoDireccion(4);
+		}
+		if (valorY < 6.5 && valorY > 3.2) {
+			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_der_max);
+			comandoDireccion(5);
+		}
+		if (valorY > 6.7) {
+			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_der_top);
+			comandoDireccion(6);
+		}
+		
+		
+		
 		return res;
 	}
 
+	public void comandoVelocidad(int i){
+		ca.inicializaLista(ca.comandosVelocidadPulsados,5);
+		ca.actualizaLista(ca.comandosVelocidadFueronPulsados, i,5);
+		ca.actualizaListaComando(ca.comandosVelocidadPulsados, i,5);
+		if (ca.comparaComando(ca.comandosVelocidadPulsados, ca.comandosVelocidadFueronPulsados, i)){
+			ca.actualizaListaComando(ca.comandosVelocidadFueronPulsados, i, 5);
+			Log.e("ACELETOMETRO", "COMANDO: "+ ca.comandosVelocidad.get(i));
+			sendMessage(ca.comandosVelocidad.get(i) + "\r");
+			((TextView) findViewById(R.id.valorX)).setText("X: " + curX);
+		}
+	}
+	
 	public char comandoAcelerometroX(float valorX) {
 		char res = ' ';
-		if (valorX > 2.0 && valorX < 5.0) {
-			res = 'A';
-			// sendMessage(res + "\r");
-			Log.d("Acelerometro", res + "\r");
+		if(valorX > 1.2 && valorX < 2.2){
+			findViewById(R.id.velocidad).setBackgroundResource(R.drawable.acel_3);
+			comandoVelocidad(0);
 		}
-		if (valorX > 9.0 && valorX < 10.0) {
-			res = 'B';
-			// sendMessage(res + "\r");
-			Log.d("Acelerometro", res + "\r");
+		if (valorX > 2.6 && valorX < 4.2) {
+			findViewById(R.id.velocidad).setBackgroundResource(R.drawable.acel_2);
+			comandoVelocidad(1);
 		}
+		if(valorX > 4.4 && valorX < 6.2){
+			findViewById(R.id.velocidad).setBackgroundResource(R.drawable.acel_1);
+			comandoVelocidad(2);
+		}
+		if((valorX > 6.4 && valorX < 8.4) || valorX < 1.0){
+			findViewById(R.id.velocidad).setBackgroundResource(R.drawable.acel_stop);
+			comandoVelocidad(3);
+		}
+		if (valorX > 8.6 && valorX < 11.0) {
+			findViewById(R.id.velocidad).setBackgroundResource(R.drawable.acel_0);
+			comandoVelocidad(4);
+		}
+		
+
 		return res;
 	}
 
