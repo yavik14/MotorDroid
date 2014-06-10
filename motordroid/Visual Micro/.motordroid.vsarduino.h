@@ -40,28 +40,36 @@ extern "C" void __cxa_pure_virtual() {;}
 
 //
 //
+void lecturaComandos();
 void cambioModo(char com);
 void frenar();
 void luces();
-void parpadeoLedIZQ();
-void parpadeoLedDER();
-void parpadeoLedCEN();
 void acelerar();
 void marchaAtras();
 void giroIzquierda();
 void giroDerecha();
-void velocidadMax();
-void velocidadMedia();
-void velocidadMin();
-void velocidadCero();
-void velocidadAtras();
-void direccionRecto();
-void direccionIzquierdaMin();
-void direccionIzquierdaMed();
-void direccionIzquierdaMax();
-void direccionDerechaMin();
-void direccionDerechaMed();
-void direccionDerechaMax();
+void parpadeoLedIZQ();
+void parpadeoLedDER();
+void parpadeoLedCEN();
+void controlAcelerometro(int vel, char com);
+void autoExplorar();
+void posInicialServos();
+void exploraUp();
+void exploraDown();
+void exploraLeft();
+void exploraRight();
+void explorarStop();
+void servoUp();
+void servoDown();
+void servoLeft();
+void servoRight();
+void movimientoServo();
+float medirDistancia();
+void parpadeoLaser();
+void apagarLaser();
+void cambiaEstadoLaser();
+void startStopCircuito();
+void modoCircuito();
 int compruebaLineaDerecha();
 int compruebaLineaIzquierda();
 void sigueLinea();
@@ -70,8 +78,6 @@ void lineaDerecha();
 void testMotores();
 void testMotoresDC();
 void parpadeoLeds();
-void movimientoServo();
-float medirDistancia();
 
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\cores\arduino\arduino.h"
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\variants\mega\pins_arduino.h" 

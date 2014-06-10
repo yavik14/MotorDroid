@@ -18,6 +18,7 @@
             android:layout_weight="1"
             android:background="@drawable/modo_man_sel"
             android:checked="true"
+            android:enabled="true"
             android:textOff=""
             android:textOn="" />
 
@@ -27,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/modo_vol"
+            android:enabled="true"
             android:textOff=""
             android:textOn="" />
 
@@ -36,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/modo_exp"
+            android:enabled="true"
             android:textOff=""
             android:textOn="" />
 
@@ -45,6 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/modo_cir"
+            android:enabled="true"
             android:textOff=""
             android:textOn="" />
     </LinearLayout>
@@ -64,9 +68,9 @@
             android:id="@+id/modo1Direcion"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="@color/azulclaro"
             android:orientation="vertical"
-            android:layout_weight="1"
             android:visibility="visible" >
 
             <LinearLayout
@@ -82,7 +86,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@drawable/dir_izquierda" />
+                    android:background="@drawable/dir_izquierda"
+                    android:enabled="false" />
 
                 <Button
                     android:id="@+id/giroDerecha"
@@ -90,9 +95,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@drawable/dir_derecha" />
+                    android:background="@drawable/dir_derecha"
+                    android:enabled="false" />
             </LinearLayout>
-
         </LinearLayout>
 
         <LinearLayout
@@ -116,33 +121,63 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/acel_izq_med" />
+                    android:background="@drawable/acel_recto" />
             </LinearLayout>
         </LinearLayout>
-        
+
         <LinearLayout
-            android:id="@+id/modo3Auto"
+            android:id="@+id/modo3Direccion"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:background="@color/azulclaro"
             android:orientation="vertical"
             android:visibility="gone" >
 
+            <Button
+                android:id="@+id/exploraUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2"
+                android:background="@drawable/explora_up"
+                android:enabled="true" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="3"
                 android:orientation="horizontal" >
 
                 <Button
-                    android:id="@+id/autExplorador"
+                    android:id="@+id/exploraLeft"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/auto_naranja" />
+                    android:layout_weight="1"
+                    android:background="@drawable/explora_izq"
+                    android:enabled="true" />
+
+                <Button
+                    android:id="@+id/exploraRight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@drawable/explora_der"
+                    android:enabled="true" />
             </LinearLayout>
+
+            <Button
+                android:id="@+id/exploraDown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2"
+                android:background="@drawable/explora_down"
+                android:enabled="true" />
         </LinearLayout>
 
         <LinearLayout
@@ -161,12 +196,15 @@
                 android:layout_weight="1"
                 android:orientation="horizontal" >
 
-                <Button
+                <ToggleButton
                     android:id="@+id/startCircuito"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/start_naranja" />
+                    android:background="@drawable/start_naranja"
+                    android:enabled="true"
+                    android:textOff=""
+                    android:textOn="" />
             </LinearLayout>
         </LinearLayout>
 
@@ -176,7 +214,7 @@
             android:background="@color/motordroid" />
 
         <LinearLayout
-            android:id="@+id/modo12Central"
+            android:id="@+id/modo1Central"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -198,6 +236,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="14dp"
                     android:background="@drawable/luz_azul"
+                    android:enabled="false"
                     android:textOff=""
                     android:textOn="" />
             </LinearLayout>
@@ -215,6 +254,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:background="@drawable/int_izquierdo_blanco"
+                    android:enabled="false"
                     android:textOff=""
                     android:textOn="" />
 
@@ -225,6 +265,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:background="@drawable/int_derecho_blanco"
+                    android:enabled="false"
                     android:textOff=""
                     android:textOn="" />
             </LinearLayout>
@@ -242,6 +283,64 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/triangulo_blanco"
+                    android:enabled="false"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/modo2Central"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#202020"
+            android:orientation="vertical"
+            android:visibility="gone" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <ToggleButton
+                    android:id="@+id/luzFrontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/led_azul"
+                    android:enabled="false"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/modo3Central"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#202020"
+            android:orientation="vertical"
+            android:visibility="gone" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical" >
+
+                <ToggleButton
+                    android:id="@+id/autoExplorar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/auto_negro"
+                    android:enabled="true"
                     android:textOff=""
                     android:textOn="" />
             </LinearLayout>
@@ -293,7 +392,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/dir_adelante" />
+                android:background="@drawable/dir_adelante"
+                android:enabled="false" />
 
             <Button
                 android:id="@+id/marchaAtras"
@@ -301,7 +401,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/dir_atras" />
+                android:background="@drawable/dir_atras"
+                android:enabled="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -320,15 +421,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/acel_2" />
-            <TextView 
+                android:background="@drawable/acel_stop" />
+
+            <TextView
                 android:id="@+id/valorX"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text=""
-                />
+                android:text="" />
         </LinearLayout>
 
         <LinearLayout
@@ -342,12 +443,13 @@
             android:visibility="gone" >
 
             <Button
-                android:id="@+id/acelera"
+                android:id="@+id/servoUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="2"
-                android:background="@drawable/dir_adelante" />
+                android:background="@drawable/dir_adelante"
+                android:enabled="true" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -357,29 +459,32 @@
                 android:orientation="horizontal" >
 
                 <Button
-                    android:id="@+id/giroIzquierda"
+                    android:id="@+id/servoLeft"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@drawable/dir_izquierda" />
+                    android:background="@drawable/dir_izquierda"
+                    android:enabled="true" />
 
                 <Button
-                    android:id="@+id/giroDerecha"
+                    android:id="@+id/servoRight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@drawable/dir_derecha" />
+                    android:background="@drawable/dir_derecha"
+                    android:enabled="true" />
             </LinearLayout>
 
             <Button
-                android:id="@+id/marchaAtras"
+                android:id="@+id/servoDown"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="2"
-                android:background="@drawable/dir_atras" />
+                android:background="@drawable/dir_atras"
+                android:enabled="true" />
         </LinearLayout>
 
         <LinearLayout
@@ -398,12 +503,15 @@
                 android:layout_weight="1"
                 android:orientation="horizontal" >
 
-                <Button
+                <ToggleButton
                     android:id="@+id/stopCircuito"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/stop_azul" />
+                    android:background="@drawable/stop_negro"
+                    android:enabled="false"
+                    android:textOff=""
+                    android:textOn="" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

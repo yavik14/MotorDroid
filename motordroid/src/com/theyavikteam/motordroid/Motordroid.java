@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,9 +34,16 @@ public class Motordroid extends Activity implements SensorEventListener {
 	public boolean adelantePulsado = false;
 	public boolean izqPulsado = false;
 	public boolean derPulsado = false;
-
-	public char comandoAcelX;
-	public char comandoAcelY;
+	
+	public boolean servoUpPulsado = false;
+	public boolean servoDownPulsado = false;
+	public boolean servoLeftPulsado = false;
+	public boolean servoRightPulsado = false;
+	
+	public boolean explorerUpPulsado = false;
+	public boolean explorerDownPulsado = false;
+	public boolean explorerLeftPulsado = false;
+	public boolean explorerRightPulsado = false;
 
 	// Debugging
 	public static final String TAG = "MotorDroid";
@@ -83,6 +91,9 @@ public class Motordroid extends Activity implements SensorEventListener {
 
 	private ToggleButton botonLed;
 	private ToggleButton botonTriangulo;
+	
+	private ToggleButton botonLed2;
+	
 	public Button botonAtras;
 	public Button botonDer;
 	public Button botonIzq;
@@ -99,24 +110,42 @@ public class Motordroid extends Activity implements SensorEventListener {
 	public View vistaDModo3;
 	public View vistaDModo4;
 
-	public View vistaCModo12;
+	public View vistaCModo1;
+	public View vistaCModo2;
+	public View vistaCModo3;
 	public View vistaCModo4;
 
 	public ComandosAcelerometro ca = new ComandosAcelerometro();
 
-		
+	public Button botonServoUp;
+	public Button botonServoDown;
+	public Button botonServoLeft;
+	public Button botonServoRight;
+
+	public Button botonExplorerRight;
+	public Button botonExplorerLeft;
+	public Button botonExplorerDown;
+	public Button botonExplorerUp;
+
+	public ToggleButton botonExplorerAutomatico;
+
+	public ToggleButton botonStartCircuito;
+	public ToggleButton botonStopCircuito;
+
 	//CONTROL DEL MENU PRINCIPAL Y MODOS DE FUNCIONAMIENTO
 	public void controlMenu(View v){
 		if(v == botonManual){
 			vistaIModo1.setVisibility(View.VISIBLE);
 			vistaDModo1.setVisibility(View.VISIBLE);
-			vistaCModo12.setVisibility(View.VISIBLE);
+			vistaCModo1.setVisibility(View.VISIBLE);
 			
 			vistaIModo2.setVisibility(View.GONE);
 			vistaDModo2.setVisibility(View.GONE);
+			vistaCModo2.setVisibility(View.GONE);
 			
 			vistaIModo3.setVisibility(View.GONE);
 			vistaDModo3.setVisibility(View.GONE);
+			vistaCModo3.setVisibility(View.GONE);
 			
 			vistaIModo4.setVisibility(View.GONE);
 			vistaDModo4.setVisibility(View.GONE);
@@ -141,13 +170,15 @@ public class Motordroid extends Activity implements SensorEventListener {
 		}else if(v == botonVolante){
 			vistaIModo1.setVisibility(View.GONE);
 			vistaDModo1.setVisibility(View.GONE);
-			vistaCModo12.setVisibility(View.VISIBLE);
+			vistaCModo1.setVisibility(View.GONE);
 			
 			vistaIModo2.setVisibility(View.VISIBLE);
 			vistaDModo2.setVisibility(View.VISIBLE);
+			vistaCModo2.setVisibility(View.VISIBLE);
 			
 			vistaIModo3.setVisibility(View.GONE);
 			vistaDModo3.setVisibility(View.GONE);
+			vistaCModo3.setVisibility(View.GONE);
 			
 			vistaIModo4.setVisibility(View.GONE);
 			vistaDModo4.setVisibility(View.GONE);
@@ -172,13 +203,15 @@ public class Motordroid extends Activity implements SensorEventListener {
 		}else if(v == botonExplorador){
 			vistaIModo1.setVisibility(View.GONE);
 			vistaDModo1.setVisibility(View.GONE);
-			vistaCModo12.setVisibility(View.VISIBLE);
+			vistaCModo1.setVisibility(View.GONE);
 			
 			vistaIModo2.setVisibility(View.GONE);
 			vistaDModo2.setVisibility(View.GONE);
+			vistaCModo2.setVisibility(View.GONE);
 			
 			vistaIModo3.setVisibility(View.VISIBLE);
 			vistaDModo3.setVisibility(View.VISIBLE);
+			vistaCModo3.setVisibility(View.VISIBLE);
 			
 			vistaIModo4.setVisibility(View.GONE);
 			vistaDModo4.setVisibility(View.GONE);
@@ -203,13 +236,15 @@ public class Motordroid extends Activity implements SensorEventListener {
 		}else if(v == botonCircuito){
 			vistaIModo1.setVisibility(View.GONE);
 			vistaDModo1.setVisibility(View.GONE);
-			vistaCModo12.setVisibility(View.GONE);
+			vistaCModo1.setVisibility(View.GONE);
 			
 			vistaIModo2.setVisibility(View.GONE);
 			vistaDModo2.setVisibility(View.GONE);
+			vistaCModo2.setVisibility(View.GONE);
 			
 			vistaIModo3.setVisibility(View.GONE);
 			vistaDModo3.setVisibility(View.GONE);
+			vistaCModo3.setVisibility(View.GONE);
 			
 			vistaIModo4.setVisibility(View.VISIBLE);
 			vistaDModo4.setVisibility(View.VISIBLE);
@@ -241,23 +276,26 @@ public class Motordroid extends Activity implements SensorEventListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_motordroid);
-		
 		setTitle("");
 		
-		//habilitaBotones(false);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		vistaIModo1 = findViewById(R.id.modo1Direcion);
 		vistaIModo2 = findViewById(R.id.modo2Direcion);
-		vistaIModo3 = findViewById(R.id.modo3Auto);
+		vistaIModo3 = findViewById(R.id.modo3Direccion);
 		vistaIModo4 = findViewById(R.id.modo4Start);
+		
+		vistaCModo1 = findViewById(R.id.modo1Central);
+		vistaCModo2 = findViewById(R.id.modo2Central);
+		vistaCModo3 = findViewById(R.id.modo3Central);
+		vistaCModo4 = findViewById(R.id.modo4Central);
 		
 		vistaDModo1 = findViewById(R.id.modo1Velocidad);
 		vistaDModo2 = findViewById(R.id.modo2Velocidad);
 		vistaDModo3 = findViewById(R.id.modo3Control);
 		vistaDModo4 = findViewById(R.id.modo4Stop);
 		
-		vistaCModo12 = findViewById(R.id.modo12Central);
-		vistaCModo4 = findViewById(R.id.modo4Central);
+
 		
 		//BOTONES DEL MENU PRINCIPAL
 		
@@ -298,7 +336,7 @@ public class Motordroid extends Activity implements SensorEventListener {
 		});
 		
 
-		
+		//BOTONES MODO MANUAL
 		//BOTONES DE LEDS
 
 		botonLed = (ToggleButton) findViewById(R.id.luces);
@@ -390,8 +428,6 @@ public class Motordroid extends Activity implements SensorEventListener {
 					atrasPulsado = false;
 					Log.d("Released", "Button B released");
 				}
-
-				// TODO Auto-generated method stub
 				return false;
 			}
 		});
@@ -409,8 +445,6 @@ public class Motordroid extends Activity implements SensorEventListener {
 					Log.d("Released", "Button R released");
 					sendMessage("F\r");
 				}
-
-				// TODO Auto-generated method stub
 				return false;
 			}
 		});
@@ -428,8 +462,6 @@ public class Motordroid extends Activity implements SensorEventListener {
 					Log.d("Released", "Button L released");
 					sendMessage("F\r");
 				}
-
-				// TODO Auto-generated method stub
 				return false;
 			}
 		});
@@ -447,11 +479,213 @@ public class Motordroid extends Activity implements SensorEventListener {
 					Log.d("Released", "Button A released");
 					sendMessage("F\r");
 				}
-
-				// TODO Auto-generated method stub
 				return false;
 			}
 		});
+	
+		//BOTONES MODO VOLANTE
+		botonLed2 = (ToggleButton) findViewById(R.id.luzFrontal);
+		botonLed2.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonLed2.isChecked()) {
+					if (D)Log.e("BotonLed2", "Luz Blanca");
+					sendMessage("W\r");
+					findViewById(R.id.luzFrontal).setBackgroundResource(R.drawable.led_blanco);
+				} else {
+					if (D)Log.e("BotonLed2s", "Luz Azul");
+					sendMessage("W\r");
+					findViewById(R.id.luzFrontal).setBackgroundResource(R.drawable.led_azul);
+				}
+			}
+		});
+		
+		//BOTONES MODO EXPLORADOR
+		//CONTROL VEHICULO
+		botonExplorerUp = (Button) findViewById(R.id.exploraUp);
+		botonExplorerUp.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL DIRECCION", "W pulsado");
+					explorerUpPulsado = true;
+					sendMessage("W\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					explorerUpPulsado = false;
+					Log.d("CONTROL DIRECCION", "W soltado");
+					sendMessage("X\r");
+				}
+				return false;
+			}
+		});
+		
+		botonExplorerDown = (Button) findViewById(R.id.exploraDown);
+		botonExplorerDown.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL DIRECCION", "S pulsado");
+					explorerDownPulsado = true;
+					sendMessage("S\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					explorerDownPulsado = false;
+					Log.d("CONTROL DIRECCION", "S soltado");
+					sendMessage("X\r");
+				}
+				return false;
+			}
+		});
+		
+		botonExplorerLeft = (Button) findViewById(R.id.exploraLeft);
+		botonExplorerLeft.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL DIRECCION", "A pulsado");
+					explorerLeftPulsado = true;
+					sendMessage("A\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					explorerLeftPulsado = false;
+					Log.d("CONTROL DIRECCION", "A soltado");
+					sendMessage("X\r");
+				}
+				return false;
+			}
+		});
+		
+		botonExplorerRight = (Button) findViewById(R.id.exploraRight);
+		botonExplorerRight.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL DIRECCION", "D pulsado");
+					explorerRightPulsado = true;
+					sendMessage("D\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					explorerRightPulsado = false;
+					Log.d("CONTROL DIRECCION", "D soltado");
+					sendMessage("X\r");
+				}
+				return false;
+			}
+		});
+		
+		//CONTROL AUTOMATICO
+		botonExplorerAutomatico = (ToggleButton) findViewById(R.id.autoExplorar);
+		botonExplorerAutomatico.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonExplorerAutomatico.isChecked()) {
+					Log.i("AUTO EXPLORER", "ACTIVADO");
+					sendMessage("E\r");
+					findViewById(R.id.autoExplorar).setBackgroundResource(R.drawable.auto_naranja);
+				} else {
+					Log.e("AUTO EXPLORER", "DESACTIVADO");
+					sendMessage("E\r");
+					findViewById(R.id.autoExplorar).setBackgroundResource(R.drawable.auto_negro);
+				}
+			}
+		});
+		
+		//CONTROL CABEZA
+		botonServoUp = (Button) findViewById(R.id.servoUp);
+		botonServoUp.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL CABEZA", "I pulsado");
+					servoUpPulsado = true;
+					sendMessage("I\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					servoUpPulsado = false;
+					Log.d("CONTROL CABEZA", "I soltado");
+					sendMessage("F\r");
+				}
+				return false;
+			}
+		});
+		
+		botonServoDown = (Button) findViewById(R.id.servoDown);
+		botonServoDown.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL CABEZA", "K pulsado");
+					servoDownPulsado = true;
+					sendMessage("K\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					servoDownPulsado = false;
+					Log.d("CONTROL CABEZA", "K soltado");
+					sendMessage("F\r");
+				}
+				return false;
+			}
+		});
+		
+		botonServoLeft = (Button) findViewById(R.id.servoLeft);
+		botonServoLeft.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL CABEZA", "J pulsado");
+					servoLeftPulsado = true;
+					sendMessage("J\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					servoLeftPulsado = false;
+					Log.d("CONTROL CABEZA", "J soltado");
+					sendMessage("F\r");
+				}
+				return false;
+			}
+		});
+		
+		botonServoRight = (Button) findViewById(R.id.servoRight);
+		botonServoRight.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.i("CONTROL CABEZA", "L pulsado");
+					servoRightPulsado = true;
+					sendMessage("L\r");
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					servoRightPulsado = false;
+					Log.d("CONTROL CABEZA", "L soltado");
+					sendMessage("F\r");
+				}
+				return false;
+			}
+		});
+		
+		//MODO CIRCUITO
+		botonStartCircuito = (ToggleButton) findViewById(R.id.startCircuito);
+		botonStartCircuito.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonStartCircuito.isChecked()) {
+					if (D)Log.e("MODO CIRCUITO", "START");
+					sendMessage("S\r");
+					findViewById(R.id.startCircuito).setBackgroundResource(R.drawable.start_negro);
+					botonStopCircuito.setChecked(false);
+					botonStopCircuito.setEnabled(true);
+					botonStartCircuito.setEnabled(false);
+					findViewById(R.id.stopCircuito).setBackgroundResource(R.drawable.stop_azul);
+				} else {
+					findViewById(R.id.startCircuito).setBackgroundResource(R.drawable.start_naranja);
+				}
+			}
+		});
+		
+		
+		botonStopCircuito = (ToggleButton) findViewById(R.id.stopCircuito);
+		botonStopCircuito.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View vv) {
+				if (botonStopCircuito.isChecked()) {
+					if (D)Log.e("MODO CIRCUITO", "STOP");
+					sendMessage("S\r");
+					findViewById(R.id.stopCircuito).setBackgroundResource(R.drawable.stop_negro);
+					botonStartCircuito.setChecked(false);
+					botonStopCircuito.setEnabled(false);
+					botonStartCircuito.setEnabled(true);
+					findViewById(R.id.startCircuito).setBackgroundResource(R.drawable.start_naranja);
+				} else {
+					findViewById(R.id.stopCircuito).setBackgroundResource(R.drawable.stop_azul);
+				}
+			}
+		});
+		
+		
+		//habilitaBotones(false);
+		
+		
 	}
 	
 	public void habilitaBotones(boolean b){
@@ -464,6 +698,8 @@ public class Motordroid extends Activity implements SensorEventListener {
 			botonIntermitenteDerecho.setEnabled(true);
 			botonIntermitenteIzquierdo.setEnabled(true);
 			botonTriangulo.setEnabled(true);
+			
+			botonLed2.setEnabled(true);
 		}else{
 			botonLed.setEnabled(false);
 			botonAdelante.setEnabled(false);
@@ -473,6 +709,8 @@ public class Motordroid extends Activity implements SensorEventListener {
 			botonIntermitenteDerecho.setEnabled(false);
 			botonIntermitenteIzquierdo.setEnabled(false);
 			botonTriangulo.setEnabled(false);
+			
+			botonLed2.setEnabled(false);
 		}
 	}
 
@@ -641,25 +879,17 @@ public class Motordroid extends Activity implements SensorEventListener {
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-
-	}
+		}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (modo2) {
 			curX = event.values[0];
 			curY = event.values[1];
-			//if (seleccionador) {
-				comandoAcelX = comandoAcelerometroX(curX);
-				comandoAcelY = comandoAcelerometroY(curY);
-			//}
-			/*((TextView) findViewById(R.id.X)).setText("X: " + curX);
-			((TextView) findViewById(R.id.comandoX)).setText("Comando: "
-					+ comandoAcelX);
-			((TextView) findViewById(R.id.Y)).setText("Y: " + curY);
-			((TextView) findViewById(R.id.comandoY)).setText("Comando: "
-					+ comandoAcelY);*/
+			if (seleccionador) {
+				comandoAcelerometroX(curX);
+				comandoAcelerometroY(curY);
+			}
 		}
 	}
 	
@@ -674,9 +904,7 @@ public class Motordroid extends Activity implements SensorEventListener {
 		}
 	}
 
-	public char comandoAcelerometroY(float valorY) {
-		char res = ' ';
-		
+	public void comandoAcelerometroY(float valorY) {
 		if (valorY < -6.7) {
 			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_izq_top);
 			comandoDireccion(0);
@@ -706,10 +934,6 @@ public class Motordroid extends Activity implements SensorEventListener {
 			findViewById(R.id.giro).setBackgroundResource(R.drawable.acel_der_top);
 			comandoDireccion(6);
 		}
-		
-		
-		
-		return res;
 	}
 
 	public void comandoVelocidad(int i){
@@ -724,8 +948,7 @@ public class Motordroid extends Activity implements SensorEventListener {
 		}
 	}
 	
-	public char comandoAcelerometroX(float valorX) {
-		char res = ' ';
+	public void comandoAcelerometroX(float valorX) {
 		if(valorX > 1.2 && valorX < 2.2){
 			findViewById(R.id.velocidad).setBackgroundResource(R.drawable.acel_3);
 			comandoVelocidad(0);
@@ -746,9 +969,6 @@ public class Motordroid extends Activity implements SensorEventListener {
 			findViewById(R.id.velocidad).setBackgroundResource(R.drawable.acel_0);
 			comandoVelocidad(4);
 		}
-		
-
-		return res;
 	}
 
 }
