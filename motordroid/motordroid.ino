@@ -9,14 +9,14 @@
 #include <AFMotor.h>
 #include <Servo.h>
 
+
+//DEFICINIONES
+
 //Creamos instancias de DCMotor: M1 y M2 con una frecuencia de 64KHZ,  M3 y M4 con la frecuencia maxima permitida de 1KHZ
 AF_DCMotor motor1(1, MOTOR12_64KHZ); 
 AF_DCMotor motor2(2, MOTOR12_64KHZ);
 AF_DCMotor motor3(3);
 AF_DCMotor motor4(4);
-
-
-//DEFICINIONES
 
 //Definimos los pines para los leds del coche
 #define ledBlanco   46
@@ -29,7 +29,6 @@ AF_DCMotor motor4(4);
 //Definimos los pines para el sensor de ultrasonidos
 #define echo        22
 #define trigger     23
-
 
 //Definimos los pines para el laser
 #define laserPin    30
@@ -80,14 +79,17 @@ unsigned long tiempoPrevioD = 0;
 unsigned long tiempoPrevioC = 0; 
 
 
-//SERVOMOTOR
-//Creamos una instancia de Servomotor
-Servo servomotorX;
+//CABEZA SERVOMOTOR
+
+//Creamos dos instancias de Servomotor (eje X y eje Y)
+Servo servomotorX; 
 Servo servomotorY;
+
 //Tiempo para realizar la actualización de la posición del Servomotor
 unsigned long tiempoPrevioServo = 0;
 //Intervalo de actualización del Servo
 const long intervaloServo = 1;
+
 //Posiciones 'Actual' y 'Siguiente' del Servo
 int posicionActual = 75;
 int posicionSiguiente = 76;
@@ -99,10 +101,12 @@ const int servoXMax = 140;
 const int servoXMin = 20;
 const int servoYMax = 110;
 const int servoYMin = 50;
+
 //Permitir moverse al servo
 boolean moverServo = false;
 //Autoexplorar
 boolean explorarActivo = false;
+
 //Tiempos de parpadeo laser
 const long parLaser = 700;
 unsigned long tiempoPrevioLaser = 0; 
@@ -123,14 +127,18 @@ const long intervaloAutomatico = 1000;
 
 //Ultimo sensor activo antes de perder la linea a seguir
 int ultimaLinea;
+
 //Tiempos para la condicion de parada en caso de no encontrar la linea a seguir
 unsigned long tiempoPrevioLinea = 0;
 unsigned long tiempoActualLinea = 0;
 //Tiempo de parada si no encuentra la linea a seguir
 const long intervaloLinea = 3000;
+
 //Dar comienzo a seguir la linea
 boolean circuito = false;
 
+
+//NUCLEO PRINCIPAL DE MOTORDROID (y de todo Sketch de Arduino)
 
 // Funcion 'Setup', para la configuracion inicial de MotorDroid
 void setup() {   
@@ -187,9 +195,7 @@ void setup() {
 
 }
 
-
-
-// Funcion 'Loop', que se va a refrescar con un delay de 30
+// Funcion 'Loop', se va a refrescar con un delay de 30 y contiene toda la funcionalidad de Motordroid
 void loop() {
 	//MODO MANUAL
 	if (modo == 1){
@@ -197,233 +203,56 @@ void loop() {
 		lecturaComandos();
 		//Si nos llega un comando para cambiar de modo
 		cambioModo(comando);
-		//Cambio de luces largas (led blanco) a cortas (led azul) o viceversa
-		if (comando == 'W'){
-			luces();
-		}
-		else if (comando == 'F'){
-			//Serial.println("Encendemos luz Roja");
-			frenar();
-		}
-		else if (comando == 'A'){
-			acelerar();
-		}
-		else if (comando == 'L'){
-			giroIzquierda();
-		}
-		else if (comando == 'R'){
-			giroDerecha();
-		}
-		else if (comando == 'B'){
-			//Serial.println("Encendemos luz Roja");
-			marchaAtras();
-		}
-		else if (comando == 'E'){
-			//Serial.println("Encendemos luz Roja");
-			pulsacionesCen += 1;
-			Serial.println(pulsacionesCen);
-		}
-		else if (comando == 'D'){
-			//Serial.println("Encendemos luz Roja");
-			pulsacionesDer += 1;
-			Serial.println(pulsacionesDer);
-		}
-		else if (comando == 'I'){
-			//Serial.println("Encendemos luz Roja");
-			pulsacionesIzq += 1;
-			Serial.println(pulsacionesIzq);
-		}
-
-		//Si pulsamos el estacionador reinicia los contadores de los intermitentes  
-		if((pulsacionesCen%2) == 1){
-			pulsacionesIzq = 0;
-			pulsacionesDer = 0;
-			parpadeoLedCEN();
-		}else{
-
-			//Si el módulo 2 de las pulsaciones es 1 activamos el parpadeo
-			if((pulsacionesIzq%2) == 1 && (pulsacionesDer%2) == 0){
-				parpadeoLedIZQ();
-			}
-			if((pulsacionesDer%2) == 1 && (pulsacionesIzq%2) == 0){
-				parpadeoLedDER();
-			}
-			//Si el módulo 2 de las pulsaciones es 0 apagamos los leds
-			if((pulsacionesDer%2) == 0 && (pulsacionesIzq%2) == 0){
-				digitalWrite(ledDer, LOW);
-				digitalWrite(ledIzq, LOW);
-			}//Si un led estaba en función parpadeo al pulsar el otro, le sumamos 1 y lo apagamos
-			if((pulsacionesIzq%2) == 1 && (pulsacionesDer%2) == 1){
-				if(comando == 'I'){
-					pulsacionesDer += 1;
-					digitalWrite(ledDer, LOW);
-				}else if(comando == 'D'){
-					pulsacionesIzq += 1;
-					digitalWrite(ledIzq, LOW);
-				}
-			}
-		}
-		
+		//Acciones del Modo Manual
+		modoManual();
+			
 	}//MODO VOLANTE
 	else if (modo == 2){
-		//Comprueba que el serial está activo
-		if(Serial3.available()){
-			//Leemos comando
-			comando = Serial3.read();
-			//Liberamos el Serial BT
-			Serial3.flush();
-			//Mostramos por Serial el comando leído
-			Serial.println(comando);			
-			//Liberamos el Serial BT
-			Serial3.flush();
-		} 
+		//Leemos el comando 
+		lecturaComandos();
 		//Si nos llega un comando para cambiar de modo
-		cambioModo(comando); 
-		if (comando == 'W'){
-			luces();
-		}
-		else if (comando == 'A'){
-			//velocidadMax();
-			controlAcelerometro(235, ' ');
-		}
-		else if (comando == 'B'){
-			//velocidadMedia();
-			controlAcelerometro(200, ' ');
-		}
-		else if (comando == 'C'){
-			//velocidadMin();
-			controlAcelerometro(150, ' ');
-		}
-		else if (comando == 'D'){
-			//velocidadCero();
-			controlAcelerometro(0, ' ');
-		}
-		else if (comando == 'E'){
-			//velocidadAtras();
-			controlAcelerometro(100, ' ');
-		}
-		else if (comando == 'F'){
-			//direccionIzquierdaMax();
-			controlAcelerometro(-1, comando);
-		}
-		else if (comando == 'G'){
-			//direccionIzquierdaMed();
-			controlAcelerometro(-1, comando);
-		}
-		else if (comando == 'H'){
-			//direccionIzquierdaMin();
-			controlAcelerometro(-1, comando);
-		}
-		else if (comando == 'I'){
-			//direccionRecto();
-			controlAcelerometro(-1, comando);
-		}
-		else if (comando == 'J'){
-			//direccionDerechaMin();
-			controlAcelerometro(-1, comando);
-		}
-		else if (comando == 'K'){
-			//direccionDerechaMed();
-			controlAcelerometro(-1, comando);
-		}
-		else if (comando == 'L'){
-			//direccionDerechaMax();
-			controlAcelerometro(-1, comando);
-		}
+		cambioModo(comando);
+		//Acciones del Modo Volante
+		modoVolante();
 
 	}//MODO EXPLORADOR
 	else if (modo == 3){
-		distancia = medirDistancia();
 		//Leemos el comando 
 		lecturaComandos();
 		//Si nos llega un comando para cambiar de modo
 		cambioModo(comando);
-
+		//Si nos llega el comando de Explorar cambiamos el estado
 		if (comando == 'E'){
 			autoExplorar();
 		}
-
+		//Comprobamos la distancia
+		distancia = medirDistancia();
+		//Si esta activo explorar automaticamente
 		if(explorarActivo == true ){
-			if(distancia >= 0.6){
-				movimientoServo();
-				exploraUp();
-				estadoLaser = LOW;
-				digitalWrite(laserPin, estadoLaser);
-			}else if(0.58 > distancia && distancia > 0.42 ){
-				movimientoServo();
-				cambiaEstadoLaser();
-				if(posicionActual < 70){
-					exploraRight();  
-				}else{
-					exploraLeft();
-				}
-			}else if (distancia <= 0.4){   
-				estadoLaser = HIGH; 
-				digitalWrite(laserPin, estadoLaser);
-				exploraDown();   
-			}
+			explorar();
+		//Si no exploramos manualmente
 		}else{
-			if (comando == 'W'){
-				exploraUp();
-			}
-			else if (comando == 'S'){
-				exploraDown();
-			}
-			else if (comando == 'A'){
-				exploraLeft();
-			}
-			else if (comando == 'D'){
-				exploraRight();
-			}
-			else if (comando == 'X'){
-				explorarStop();
-			}
-			else if (comando == 'I'){
-				servoUp();
-			}
-			else if (comando == 'K'){
-				servoDown();
-			}
-			else if (comando == 'J'){
-				servoLeft();
-			}
-			else if (comando == 'L'){
-				servoRight();
-			}
-			else if (comando == 'F'){
-				//servoStop();
-			}
-
-			if(distancia >= 0.6){
-				estadoLaser = LOW;
-				digitalWrite(laserPin, estadoLaser);
-			}else if(0.6 > distancia && distancia > 0.3 ){
-				cambiaEstadoLaser();
-			}else if (distancia <= 0.3){   
-				estadoLaser = HIGH; 
-				digitalWrite(laserPin, estadoLaser);
-			} 
+			explorarManual(); 
 		}
-		
 
 	}//MODO CIRCUITO
-	else if (modo ==4){ 
+	else if (modo == 4){ 
 		//Leemos el comando 
 		lecturaComandos();
 		//Si nos llega un comando para cambiar de modo
 		cambioModo(comando);
+		//Cambiamos el estado del Modo Circuito
 		if(comando == 'S'){
 			startStopCircuito();
 		}
+		//Si esta activo
 		if(circuito){
 			modoCircuito();
-		}
-		
+		}	
 	}
 	//Dejamos 30 milisegundos de refresco
 	delay(30);  
 }
-
 
 
 //ACCIONES COMPARTIDAS ENTRE ALGUNOS MODOS
@@ -445,7 +274,9 @@ void lecturaComandos(){
 
 //Funcion para cambiar de Modo de funcionamiento
 void cambioModo(char com){
+		//MODO MANUAL
 	if (com == '1'){
+		Serial.println("MODO MANUAL");
 		modo = com - '0';
 		frenar();
 		posInicialServos();
@@ -453,6 +284,7 @@ void cambioModo(char com){
 		delay(1000);
 		//MODO VOLANTE
 	}else if (com == '2'){
+		Serial.println("MODO VOLANTE");
 		modo = com - '0';
 		frenar();
 		posInicialServos();
@@ -460,12 +292,14 @@ void cambioModo(char com){
 		delay(1000);
 		//MODO EXPLORADOR
 	}else if (com == '3'){
+		Serial.println("MODO EXPLORADOR");
 		modo = com - '0';
 		frenar();
 		posInicialServos();
 		delay(1000);
 		//MODO CIRCUITO
 	}else if (com == '4'){
+		Serial.println("MODO CIRCUITO");
 		modo = com - '0';
 		frenar();
 		posInicialServos();
@@ -478,10 +312,11 @@ void cambioModo(char com){
 void frenar(){
 	digitalWrite(ledRojo, HIGH);
 	digitalWrite(ledAtras, LOW);
-	motor1.setSpeed(0);
-	motor2.setSpeed(0);
-	motor3.setSpeed(0);
-	motor4.setSpeed(0);
+	velocidad = 0;
+	motor1.setSpeed(velocidad);
+	motor2.setSpeed(velocidad);
+	motor3.setSpeed(velocidad);
+	motor4.setSpeed(velocidad);
 	motor1.run(RELEASE);
 	motor2.run(RELEASE);
 	motor3.run(RELEASE);
@@ -508,10 +343,108 @@ void luces(){
 
 //ACCIONES MODO MANUAL
 
+//Comandos del Modo Manual
+void modoManual(){
+    //Cambio de luces largas (led blanco) a cortas (led azul) o viceversa
+	if (comando == 'W'){
+		luces();
+	}
+	//Frenamos
+	else if (comando == 'F'){
+		Serial.println("FRENAR");
+		frenar();
+	}
+	//Aceleramos
+	else if (comando == 'A'){
+		Serial.println("ACELERAR");
+		acelerar();
+	}
+	//Giro izquierda
+	else if (comando == 'L'){
+		Serial.println("GIRO IZQUIERDA");
+		giroIzquierda();
+	}
+	//Giro derecha
+	else if (comando == 'R'){
+		Serial.println("GIRO DERECHA");
+		giroDerecha();
+	}
+	//Vueltas en sentido antihorario
+	else if (comando == 'M'){
+		Serial.println("LOOPING LEFT");
+		vueltaAntireloj();
+	}
+	//Vueltas en sentido horario
+	else if (comando == 'N'){
+		Serial.println("LOOPING RIGHT");
+		vueltaReloj();
+	}
+	//Marcha atras
+	else if (comando == 'B'){
+		Serial.println("MARCHA ATRAS");
+		marchaAtras();
+	}
+	//Luces estacionadoras
+	else if (comando == 'E'){
+		Serial.println("LUCES ESTACIONADORAS");
+		pulsacionesCen += 1;
+		Serial.println(pulsacionesCen);
+	}
+	//Intermitente Derecho
+	else if (comando == 'D'){
+		Serial.println("INTERMITENTE DERECHO");
+		pulsacionesDer += 1;
+		Serial.println(pulsacionesDer);
+	}
+	//Intermitente Izquierdo
+	else if (comando == 'I'){
+		Serial.println("INTERMITENTE IZQUIERDO");
+		pulsacionesIzq += 1;
+		Serial.println(pulsacionesIzq);
+	}
+
+	//Control del sistema de intermitentes
+	controlIntermitentes();
+}
+
+//Control de los estados de los intermitentes
+void controlIntermitentes(){
+//Si pulsamos el estacionador reinicia los contadores de los intermitentes  
+	if((pulsacionesCen%2) == 1){
+		pulsacionesIzq = 0;
+		pulsacionesDer = 0;
+		parpadeoLedCEN();
+	}else{
+
+		//Si el módulo 2 de las pulsaciones es 1 activamos el parpadeo
+		if((pulsacionesIzq%2) == 1 && (pulsacionesDer%2) == 0){
+			parpadeoLedIZQ();
+		}
+		if((pulsacionesDer%2) == 1 && (pulsacionesIzq%2) == 0){
+			parpadeoLedDER();
+		}
+		//Si el módulo 2 de las pulsaciones es 0 apagamos los leds
+		if((pulsacionesDer%2) == 0 && (pulsacionesIzq%2) == 0){
+			digitalWrite(ledDer, LOW);
+			digitalWrite(ledIzq, LOW);
+		}//Si un led estaba en función parpadeo al pulsar el otro, le sumamos 1 y lo apagamos
+		if((pulsacionesIzq%2) == 1 && (pulsacionesDer%2) == 1){
+			if(comando == 'I'){
+				pulsacionesDer += 1;
+				digitalWrite(ledDer, LOW);
+			}else if(comando == 'D'){
+				pulsacionesIzq += 1;
+				digitalWrite(ledIzq, LOW);
+			}
+		}
+	}
+}
+
+//Acelera
 void acelerar(){
 	digitalWrite(ledAtras, LOW);
 	digitalWrite(ledRojo, LOW);
-	velocidad = 200;
+	velocidad = 230;
 	motor1.setSpeed(velocidad);
 	motor2.setSpeed(velocidad);
 	motor3.setSpeed(velocidad);
@@ -541,11 +474,9 @@ void marchaAtras(){
 void giroIzquierda(){
 	digitalWrite(ledAtras, LOW);
 	digitalWrite(ledRojo, LOW);
-	velocidad = 180;
-	motor1.setSpeed(0);
+	velocidad = 200;
 	motor2.setSpeed(velocidad);
 	motor3.setSpeed(velocidad);
-	motor4.setSpeed(0);
 	motor1.run(RELEASE);
 	motor2.run(BACKWARD);
 	motor3.run(FORWARD);
@@ -556,16 +487,43 @@ void giroIzquierda(){
 void giroDerecha(){
 	digitalWrite(ledAtras, LOW);
 	digitalWrite(ledRojo, LOW);
-	velocidad = 180;
+	velocidad = 200;
 	motor1.setSpeed(velocidad);
-	motor2.setSpeed(0);
-	motor3.setSpeed(0);
 	motor4.setSpeed(velocidad);
 	motor1.run(FORWARD);
 	motor2.run(RELEASE);
 	motor3.run(RELEASE);
 	motor4.run(BACKWARD);
 }
+
+//Giro sobre si mismo en sentido horario
+void vueltaReloj(){
+	digitalWrite(ledAtras, LOW);
+	digitalWrite(ledRojo, LOW);
+	velocidad = 200;
+	motor1.setSpeed(velocidad);
+	motor2.setSpeed(velocidad);
+	motor3.setSpeed(velocidad);
+	motor4.setSpeed(velocidad);
+	motor1.run(FORWARD);
+	motor2.run(FORWARD);
+	motor3.run(BACKWARD);
+	motor4.run(BACKWARD);
+}
+
+//Giro sobre si mismo en sentido antihorario
+void vueltaAntireloj(){
+	digitalWrite(ledAtras, LOW);
+	digitalWrite(ledRojo, LOW);
+	velocidad = 200;
+	motor1.setSpeed(velocidad);
+	motor2.setSpeed(velocidad);
+	motor3.setSpeed(velocidad);
+	motor4.setSpeed(velocidad);
+	motor1.run(BACKWARD);
+	motor2.run(BACKWARD);
+	motor3.run(FORWARD);
+	motor4.run(FORWARD);}
 
 //Funcion parpadeo de led izquierdo
 void parpadeoLedIZQ(){
@@ -629,44 +587,52 @@ void parpadeoLedCEN(){
 
 //ACCIONES MODO VOLANTE
 
+//Control del vehiculo con el acelerometro
 void controlAcelerometro(int vel, char com){
 	if(vel < 0){
 		if(com == 'F'){
+			Serial.println("GIRO IZQUIERDA MAXIMO");
 			velAcelReducida = 0;
 			motor1.setSpeed(velAcelReducida);
 			motor2.setSpeed(velAcel);
 			motor3.setSpeed(velAcel);
 			motor4.setSpeed(velAcelReducida);
 		}else if(com == 'G'){
+			Serial.println("GIRO IZQUIERDA MEDIO");
 			velAcelReducida = velAcel - 100;
 			motor1.setSpeed(velAcelReducida);
 			motor2.setSpeed(velAcel);
 			motor3.setSpeed(velAcel);
 			motor4.setSpeed(velAcelReducida);
 		}else if(com == 'H'){
+			Serial.println("GIRO IZQUIERDA MINIMO");
 			velAcelReducida = velAcel - 40;
 			motor1.setSpeed(velAcelReducida);
 			motor2.setSpeed(velAcel);
 			motor3.setSpeed(velAcel);
 			motor4.setSpeed(velAcelReducida);
 		}else if(com == 'I'){
+			Serial.println("DIRECCION RECTA");
 			motor1.setSpeed(velAcel);
 			motor2.setSpeed(velAcel);
 			motor3.setSpeed(velAcel);
 			motor4.setSpeed(velAcel);
 		}else if(com == 'J'){
+			Serial.println("GIRO DERECHA MINIMO");
 			velAcelReducida = velAcel - 40;
 			motor1.setSpeed(velAcel);
 			motor2.setSpeed(velAcelReducida);
 			motor3.setSpeed(velAcelReducida);
 			motor4.setSpeed(velAcel);
 		}else if(com == 'K'){
+			Serial.println("GIRO DERECHA MEDIO");
 			velAcelReducida = velAcel - 100;
 			motor1.setSpeed(velAcel);
 			motor2.setSpeed(velAcelReducida);
 			motor3.setSpeed(velAcelReducida);
 			motor4.setSpeed(velAcel);
 		}else if(com == 'L'){
+			Serial.println("GIRO DERECHA MAXIMO");
 			velAcelReducida = 0;
 			motor1.setSpeed(velAcel);
 			motor2.setSpeed(velAcelReducida);
@@ -677,13 +643,15 @@ void controlAcelerometro(int vel, char com){
 	}else{
 		velAcel = vel;
 		if (vel == 0){
+			Serial.println("PARADO");
 			digitalWrite(ledAtras, LOW);
 			digitalWrite(ledRojo, HIGH);
 			motor1.run(RELEASE);
 			motor2.run(RELEASE);
 			motor3.run(RELEASE);
 			motor4.run(RELEASE);
-		}else if(vel == 100){
+		}else if(vel == 140){
+			Serial.println("MARCHA ATRAS");
 			digitalWrite(ledAtras, HIGH);
 			digitalWrite(ledRojo, LOW);
 			motor1.run(BACKWARD);
@@ -692,6 +660,7 @@ void controlAcelerometro(int vel, char com){
 			motor4.run(FORWARD);
 		}
 		else {
+			Serial.println("ACELERAR");
 			digitalWrite(ledAtras, LOW);
 			digitalWrite(ledRojo, LOW);
 			motor1.run(FORWARD);
@@ -702,146 +671,161 @@ void controlAcelerometro(int vel, char com){
 	}
 }
 
-/*
-
-//VELOCIDADES
-
-//Velocidad Maxima: 235 PWM
-void velocidadMax(){
-	digitalWrite(ledAtras, LOW);
-	digitalWrite(ledRojo, LOW);
-	velAcel = 235;
-	motor1.run(FORWARD);
-	motor2.run(BACKWARD);
-	motor3.run(FORWARD);
-	motor4.run(BACKWARD);
+//Comandos del Modo Volante
+void modoVolante(){
+	//Cambiamos de luces largas a cortas o viceversa
+	if (comando == 'W'){
+		luces();
+	}
+	//Velocidad maxima
+	else if (comando == 'A'){
+		controlAcelerometro(235, ' ');
+	}
+	//Velocidad media
+	else if (comando == 'B'){
+		controlAcelerometro(200, ' ');
+	}
+	//Velocidad minima
+	else if (comando == 'C'){
+		controlAcelerometro(150, ' ');
+	}
+	//Parado
+	else if (comando == 'D'){
+		controlAcelerometro(0, ' ');
+	}
+	//Marcha atras
+	else if (comando == 'E'){
+		controlAcelerometro(140, ' ');
+	}
+	//Direccion izquierda maxima
+	else if (comando == 'F'){
+		controlAcelerometro(-1, comando);
+	}
+	//Direccion izquierda media
+	else if (comando == 'G'){
+		controlAcelerometro(-1, comando);
+	}
+	//Direccion izquierda minima
+	else if (comando == 'H'){
+		controlAcelerometro(-1, comando);
+	}
+	//Direccion recta
+	else if (comando == 'I'){
+		controlAcelerometro(-1, comando);
+	}
+	//Direccion derecha minima
+	else if (comando == 'J'){
+		controlAcelerometro(-1, comando);
+	}
+	//Direccion derecha media
+	else if (comando == 'K'){
+		controlAcelerometro(-1, comando);
+	}
+	//Direccion derecha maxima
+	else if (comando == 'L'){
+		controlAcelerometro(-1, comando);
+	}
 }
-
-//Velocidad Media: 200 PWM
-void velocidadMedia(){
-	digitalWrite(ledAtras, LOW);
-	digitalWrite(ledRojo, LOW);
-	velAcel = 200;
-	motor1.run(FORWARD);
-	motor2.run(BACKWARD);
-	motor3.run(FORWARD);
-	motor4.run(BACKWARD);
-}
-
-//Velocidad Minima: 150 PWM
-void velocidadMin(){
-	digitalWrite(ledAtras, LOW);
-	digitalWrite(ledRojo, LOW);
-	velAcel = 150;
-	motor1.run(FORWARD);
-	motor2.run(BACKWARD);
-	motor3.run(FORWARD);
-	motor4.run(BACKWARD);
-}
-
-//Velocidad 0: Motores RELEASE
-void velocidadCero(){
-	digitalWrite(ledAtras, LOW);
-	digitalWrite(ledRojo, HIGH);
-	velAcel = 0;
-	motor1.run(RELEASE);
-	motor2.run(RELEASE);
-	motor3.run(RELEASE);
-	motor4.run(RELEASE);
-}
-
-//Velocidad Atras: Motores sentido inverso, 120 PWM
-void velocidadAtras(){
-	digitalWrite(ledAtras, HIGH);
-	digitalWrite(ledRojo, LOW);
-	velAcel = 150;
-	motor1.run(BACKWARD);
-	motor2.run(FORWARD);
-	motor3.run(BACKWARD);
-	motor4.run(FORWARD);}
-
-//DIRECCIONES
-
-//Direccion Recto: Motores a velocidad constante
-void direccionRecto(){
-	motor1.setSpeed(velAcel);
-	motor2.setSpeed(velAcel);
-	motor3.setSpeed(velAcel);
-	motor4.setSpeed(velAcel);
-}
-
-//DIRECCIONES IZQUIERDA: Reducir velocidad motores izquierdo
-
-//Min: velocidad reducida en 40 PWM
-void direccionIzquierdaMin(){
-	velAcelReducida = velAcel - 40;
-	motor1.setSpeed(velAcelReducida);
-	motor2.setSpeed(velAcel);
-	motor3.setSpeed(velAcel);
-	motor4.setSpeed(velAcelReducida);
-}
-
-//Med: velocidad reducida en 100 PWM
-void direccionIzquierdaMed(){
-	velAcelReducida = velAcel - 100;
-	motor1.setSpeed(velAcelReducida);
-	motor2.setSpeed(velAcel);
-	motor3.setSpeed(velAcel);
-	motor4.setSpeed(velAcelReducida);
-}
-
-//Max: velocidad reducida a 0 PWM
-void direccionIzquierdaMax(){
-	velAcelReducida = 0;
-	motor1.setSpeed(velAcelReducida);
-	motor2.setSpeed(velAcel);
-	motor3.setSpeed(velAcel);
-	motor4.setSpeed(velAcelReducida);
-}
-
-//DIRECCIONES DERECHA: Reducir velocidad motores derecha
-
-//Min: velocidad reducida en 40 PWM
-void direccionDerechaMin(){
-	velAcelReducida = velAcel - 40;
-	motor1.setSpeed(velAcel);
-	motor2.setSpeed(velAcelReducida);
-	motor3.setSpeed(velAcelReducida);
-	motor4.setSpeed(velAcel);
-}
-
-//Med: velocidad reducida en 100 PWM
-void direccionDerechaMed(){
-	velAcelReducida = velAcel - 100;
-	motor1.setSpeed(velAcel);
-	motor2.setSpeed(velAcelReducida);
-	motor3.setSpeed(velAcelReducida);
-	motor4.setSpeed(velAcel);
-}
-
-//Max: velocidad reducida a 0 PWM
-void direccionDerechaMax(){
-	velAcelReducida = 0;
-	motor1.setSpeed(velAcel);
-	motor2.setSpeed(velAcelReducida);
-	motor3.setSpeed(velAcelReducida);
-	motor4.setSpeed(velAcel);
-}
-
-*/
 
 
 //ACCIONES MODO EXPLORADOR
 
+//Cambiamos el estado entre autoexplorar o exploracion manual
 void autoExplorar(){
 	//Posiciones iniciales de los servos
 	posInicialServos();
 	if(explorarActivo == false){
 		explorarActivo = true;	
+		Serial.println("AUTOEXPLORAR");
 	}else{
 		explorarActivo = false;
 		velocidad = 0;
 		frenar();
+		Serial.println("EXPLORACION MANUAL");
+	}
+}
+
+//Logica de exploracion
+void explorar(){
+	if(distancia >= 0.6){
+		movimientoServo();
+		exploraUp();
+		estadoLaser = LOW;
+		digitalWrite(laserPin, estadoLaser);
+	}else if(0.58 > distancia && distancia > 0.42 ){
+		movimientoServo();
+		cambiaEstadoLaser();
+		if(posicionActual < 70){
+			exploraRight();  
+		}else{
+			exploraLeft();
+		}
+	}else if (distancia <= 0.4){   
+		estadoLaser = HIGH; 
+		digitalWrite(laserPin, estadoLaser);
+		exploraDown();   
+	}
+}
+
+//Exploracion manual
+void explorarManual(){
+	//Movemos Motordroid adelante
+	if (comando == 'W'){
+		exploraUp();
+		Serial.println("ADELANTE");
+	}
+	//Movemos Motordroid atras
+	else if (comando == 'S'){
+		exploraDown();
+		Serial.println("ATRAS");
+	}
+	//Giramos Motordroid izquierda
+	else if (comando == 'A'){
+		exploraLeft();
+		Serial.println("IZQUIERDA");
+	}
+	//Giramos Motordroid derecha
+	else if (comando == 'D'){
+		exploraRight();
+		Serial.println("DERECHA");
+	}
+	//Paramos
+	else if (comando == 'X'){
+		explorarStop();
+		Serial.println("STOP");
+	}
+	//Cabeza Motordroid arriba
+	else if (comando == 'I'){
+		servoUp();
+		Serial.println("CABEZA ARRIBA");
+	}
+	//Cabeza Motordroid abajo
+	else if (comando == 'K'){
+		servoDown();
+		Serial.println("CABEZA ABAJO");
+	}
+	//Cabeza Motodroid izquierda
+	else if (comando == 'J'){
+		servoLeft();
+		Serial.println("CABEZA IZQUIERDA");
+	}
+	//Cabeza Motodroid derecha
+	else if (comando == 'L'){
+		servoRight();
+		Serial.println("CABEZA DERECHA");
+	}
+	else if (comando == 'F'){
+		//servoStop();
+	}
+	//Estados del laser
+	if(distancia >= 0.6){
+		estadoLaser = LOW;
+		digitalWrite(laserPin, estadoLaser);
+	}else if(0.6 > distancia && distancia > 0.3 ){
+		cambiaEstadoLaser();
+	}else if (distancia <= 0.3){   
+		estadoLaser = HIGH; 
+		digitalWrite(laserPin, estadoLaser);
 	}
 }
 
@@ -853,6 +837,7 @@ void posInicialServos(){
 	servomotorY.write(servoPosY);
 }
 
+//Movimientos del vehiculo explorador
 void exploraUp(){
 	digitalWrite(ledAtras, LOW);
 	digitalWrite(ledRojo, LOW);
@@ -920,6 +905,7 @@ void explorarStop(){
 	motor4.run(RELEASE);
 }
 
+//Movimientos de la cabeza exploradora
 void servoUp(){
 	servoPosY -= 10;
 	if(servoPosY >= servoYMin){
@@ -947,12 +933,6 @@ void servoRight(){
 		servomotorX.write(servoPosX);
 	}
 }
-
-/*
-void servoStop(){
-	servomotorX.write(servoPosX);
-	servomotorY.write(servoPosY);
-}*/
 
 //Funcion que controla el movimiento del servomotor donde está colocado el sensor de ultrasonidos
 void movimientoServo(){
@@ -1011,6 +991,7 @@ float medirDistancia(){
 	return res;
 }
 
+//Funcion que controla el estado de parpadeo del laser de la cabeza
 void parpadeoLaser(){
 	//Obtenemos el tiempo actual
 	unsigned long tiempoActualLaser = millis();
@@ -1020,12 +1001,14 @@ void parpadeoLaser(){
 	}
 }
 
+//Funcion que apaga el laser
 void apagarLaser(){
 	estadoLaser = LOW;
 	digitalWrite(laserPin, estadoLaser);
 	delay(500);
 }
 
+//Funcion que cambia el estado del laser
 void cambiaEstadoLaser(){
 	if(estadoLaser == LOW){
 			estadoLaser = HIGH;
@@ -1044,9 +1027,11 @@ void cambiaEstadoLaser(){
 void startStopCircuito(){
 	if(circuito == false){
 		circuito = true;
+		Serial.println("START CIRCUIT");
 	}else{
 		circuito = false;
 		frenar();
+		Serial.println("STOP CIRCUIT");
 	}
 }
 
@@ -1057,17 +1042,20 @@ void modoCircuito(){
 	int sensorDer = compruebaLineaDerecha();
 	//Si los dos sensores leen la linea, vamos recto
 	if(sensorIzq == 1 && sensorDer == 1){
+		Serial.println("SIGUE LINEA");
 		sigueLinea();
 		tiempoPrevioLinea = 0;
 		tiempoActualLinea = 0;
 	//Si solo el sensor izquierdo lee la linea, giramos izquierda
 	}else if(sensorIzq == 1 && sensorDer == 0){
+		Serial.println("LINEA A LA IZQUIERDA");
 		lineaIzquierda();
 		ultimaLinea = 1;
 		tiempoPrevioLinea = 0;
 		tiempoActualLinea = 0;
 	//Si solo el sensor derecho lee la linea, giramos derecha
 	}else if(sensorIzq == 0 && sensorDer == 1){
+		Serial.println("LINEA A LA DERECHA");
 		lineaDerecha();
 		ultimaLinea = 2;
 		tiempoPrevioLinea = 0;
@@ -1080,6 +1068,7 @@ void modoCircuito(){
 		tiempoActualLinea = millis();
 		if(tiempoActualLinea - tiempoPrevioLinea >= intervaloLinea){
 			frenar();
+			Serial.println("LINEA PERDIDA");
 		}else if(ultimaLinea = 1){
 			lineaIzquierda();
 		}else if(ultimaLinea = 2){
@@ -1116,12 +1105,13 @@ int compruebaLineaIzquierda(){
 	return res2;
 }
 
+//Funcion que hace que vaya en líne recta
 void sigueLinea(){
 	digitalWrite(ledAtras, LOW);
 	digitalWrite(ledRojo, LOW);
 	digitalWrite(ledDer, LOW);
 	digitalWrite(ledIzq, LOW);
-	velocidad = 100;
+	velocidad = 150;
 	motor1.setSpeed(velocidad);
 	motor2.setSpeed(velocidad);
 	motor3.setSpeed(velocidad);
@@ -1132,6 +1122,7 @@ void sigueLinea(){
 	motor4.run(BACKWARD);
 }
 
+//Cuando pierde la linea por la izquieda gira en ese sentido
 void lineaIzquierda(){
 	digitalWrite(ledAtras, LOW);
 	digitalWrite(ledRojo, LOW);
@@ -1145,6 +1136,7 @@ void lineaIzquierda(){
 	motor4.run(RELEASE);
 }
 
+//Cuando pierde la linea por la derecha gira ebn ese sentido
 void lineaDerecha(){
 	digitalWrite(ledAtras, LOW);
 	digitalWrite(ledRojo, LOW);
@@ -1157,7 +1149,6 @@ void lineaDerecha(){
 	motor3.run(RELEASE);
 	motor4.run(BACKWARD);
 }
-
 
 
 
