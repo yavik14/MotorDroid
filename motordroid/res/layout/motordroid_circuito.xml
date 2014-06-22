@@ -1,0 +1,120 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MotordroidApp"
+    tools:context=".Motordroid" >
+
+    <LinearLayout
+        style="@style/Zonas"
+        android:layout_weight="3" >
+
+        <ToggleButton
+            android:id="@+id/modo1"
+            style="@style/BotonMenu"
+            android:layout_weight="1"
+            android:background="@drawable/modo_man"
+            android:checked="false" />
+
+        <ToggleButton
+            android:id="@+id/modo2"
+            style="@style/BotonMenu"
+            android:layout_weight="1"
+            android:background="@drawable/modo_vol"
+            android:checked="false" />
+
+        <ToggleButton
+            android:id="@+id/modo3"
+            style="@style/BotonMenu"
+            android:layout_weight="1"
+            android:background="@drawable/modo_exp"
+            android:checked="false" />
+
+        <ToggleButton
+            android:id="@+id/modo4"
+            style="@style/BotonMenu"
+            android:layout_weight="1"
+            android:background="@drawable/modo_cir_sel"
+            android:checked="true" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/motordroid" />
+
+    <LinearLayout
+        style="@style/Zonas"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:id="@+id/modo4Start"
+            style="@style/ZonaIzq"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                style="@style/Zonas"
+                android:layout_gravity="center"
+                android:layout_weight="1" >
+
+                <ToggleButton
+                    android:id="@+id/startCircuito"
+                    style="@style/Botones"
+                    android:layout_gravity="center"
+                    android:background="@drawable/start_naranja"
+                    android:enabled="true"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="fill_parent"
+            android:background="@color/motordroid" />
+
+        <LinearLayout
+            android:id="@+id/modo4Central"
+            style="@style/ZonaCentral"
+            android:layout_weight="1" >
+
+            <LinearLayout
+                style="@style/MotordroidApp"
+                android:layout_gravity="center"
+                android:layout_weight="1" >
+
+                <Button
+                    style="@style/Botones"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/circuito_blanco" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="fill_parent"
+            android:background="@color/motordroid" />
+
+        <LinearLayout
+            android:id="@+id/modo4Stop"
+            style="@style/ZonaDer"
+            android:layout_weight="1" >
+
+            <LinearLayout
+                style="@style/Zonas"
+                android:layout_gravity="center"
+                android:layout_weight="1" >
+
+                <ToggleButton
+                    android:id="@+id/stopCircuito"
+                    style="@style/Botones"
+                    android:layout_gravity="center"
+                    android:background="@drawable/stop_negro"
+                    android:enabled="false"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

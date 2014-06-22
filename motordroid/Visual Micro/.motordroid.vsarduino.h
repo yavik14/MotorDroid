@@ -42,6 +42,7 @@ extern "C" void __cxa_pure_virtual() {;}
 //
 void lecturaComandos();
 void cambioModo(char com);
+void lucesInicio();
 void frenar();
 void luces();
 void modoManual();
@@ -82,9 +83,6 @@ int compruebaLineaIzquierda();
 void sigueLinea();
 void lineaIzquierda();
 void lineaDerecha();
-void testMotores();
-void testMotoresDC();
-void parpadeoLeds();
 
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\cores\arduino\arduino.h"
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\variants\mega\pins_arduino.h" 

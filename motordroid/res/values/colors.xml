@@ -2,4 +2,6 @@
 <resources>
   	<color name="motordroid">#00979c</color>  
   	<color name="azulclaro">#007eff</color>  
+  	<color name="amarillo">#ffc646</color>
+  	<color name="gris">#202020</color>
 </resources>

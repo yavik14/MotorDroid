@@ -278,6 +278,7 @@ void cambioModo(char com){
 	if (com == '1'){
 		Serial.println("MODO MANUAL");
 		modo = com - '0';
+		lucesInicio();
 		frenar();
 		posInicialServos();
 		apagarLaser();
@@ -285,6 +286,7 @@ void cambioModo(char com){
 		//MODO VOLANTE
 	}else if (com == '2'){
 		Serial.println("MODO VOLANTE");
+		lucesInicio();
 		modo = com - '0';
 		frenar();
 		posInicialServos();
@@ -294,6 +296,7 @@ void cambioModo(char com){
 	}else if (com == '3'){
 		Serial.println("MODO EXPLORADOR");
 		modo = com - '0';
+		lucesInicio();
 		frenar();
 		posInicialServos();
 		delay(1000);
@@ -301,11 +304,20 @@ void cambioModo(char com){
 	}else if (com == '4'){
 		Serial.println("MODO CIRCUITO");
 		modo = com - '0';
+		lucesInicio();
 		frenar();
 		posInicialServos();
 		apagarLaser();
 		delay(1000);
 	}
+}
+
+//Funcion para poner las luces delanteras en el estado inicial
+void lucesInicio(){
+	int blaEstado = LOW;
+    int azuEstado = HIGH;
+	digitalWrite(ledAzul, azuEstado);
+	digitalWrite(ledBlanco, blaEstado);
 }
 
 //Funcion que hace parar
@@ -1150,88 +1162,3 @@ void lineaDerecha(){
 	motor4.run(BACKWARD);
 }
 
-
-
-//FUNCIONES DE TESTEO
-
-//Funcion test motores
-void testMotores(){
-	//servomotor.write(115); 
-	motor1.setSpeed(200);
-	Serial.println("115");
-	Serial.println("Adelante");
-	motor1.run(FORWARD);
-	delay(3000);
-	//Movimiento desde la posicion 180 hasta la 0 
-	//servomotor.write(85);
-	Serial.println("85");
-	Serial.println("Atras");
-	motor1.run(BACKWARD); 
-	delay(3000);
-	//Movimiento desde la posicion 0 hasta la 90
-	//servomotor.write(100); 
-	Serial.println("100");
-	Serial.println("Parado");
-	motor1.run(RELEASE);
-	delay(3000); 
-}
-
-void testMotoresDC(){
-	//servomotor.write(115); 
-	motor1.setSpeed(255);
-	motor2.setSpeed(255);
-	motor3.setSpeed(255);
-	motor4.setSpeed(255);
-	motor1.run(FORWARD);
-	motor2.run(BACKWARD);
-	motor3.run(FORWARD);
-	motor4.run(BACKWARD);
-	delay(3000);
-	Serial.println("100");
-	Serial.println("Parado");
-	motor1.run(RELEASE);
-	motor2.run(RELEASE);
-	motor3.run(RELEASE);
-	motor4.run(RELEASE);
-	delay(3000); 
-	//Movimiento desde la posicion 180 hasta la 0 
-	//servomotor.write(85);
-	Serial.println("85");
-	Serial.println("Atras");
-	motor1.run(BACKWARD);
-	motor2.run(FORWARD);
-	motor3.run(BACKWARD);
-	motor4.run(FORWARD);
-	delay(3000);
-	//Movimiento desde la posicion 0 hasta la 90
-	//servomotor.write(100); 
-	Serial.println("100");
-	Serial.println("Parado");
-	motor1.run(RELEASE);
-	motor2.run(RELEASE);
-	motor3.run(RELEASE);
-	motor4.run(RELEASE);
-	delay(3000); 
-}
-
-//Funcion para parpadeo de todos los leds
-void parpadeoLeds(){
-	// encendemos los leds (Ponemos el voltaje a 'HIGH')
-	digitalWrite(ledBlanco, HIGH);
-	digitalWrite(ledAzul, HIGH);  
-	digitalWrite(ledIzq, HIGH);
-	digitalWrite(ledDer, HIGH);
-	digitalWrite(ledRojo, HIGH);   
-	digitalWrite(ledAtras, HIGH);
-	// esperamos medio segundo
-	delay(500);               
-	// apagamos los leds (Ponemos el voltaje a 'LOW')
-	digitalWrite(ledBlanco, LOW);
-	digitalWrite(ledAzul, LOW);
-	digitalWrite(ledIzq, LOW);
-	digitalWrite(ledDer, LOW);
-	digitalWrite(ledRojo, LOW);    
-	digitalWrite(ledAtras, LOW);
-	// esperamos medio segundo
-	delay(500);    
-}

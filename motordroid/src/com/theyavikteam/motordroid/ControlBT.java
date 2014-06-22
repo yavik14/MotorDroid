@@ -15,17 +15,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+//CLASE PARA EL CONTROL DEL BLUETOOTH
 public class ControlBT {
 	// Debug Para monitorizar los eventos
-	private static final String TAG = "Servicio_Bluetooth";
+	private static final String TAG = "SERVICIO BLUETOOTH";
 	private static final boolean D = true;
 
 	// Nombre para el registro SDP cuando el socket sea creado
 	private static final String NAME = "MDBluetooth";
 
 	// UUID Identificador unico de URI para esta aplicacion
-	private static final UUID MY_UUID = UUID
-			.fromString("00001101-0000-1000-8000-00805F9B34FB");
+	private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
 	// Campos de conexion
 	private final BluetoothAdapter AdaptadorBT;
@@ -37,14 +37,12 @@ public class ControlBT {
 
 	// Constantes que indican el estado de conexion
 	public static final int STATE_NONE = 0; // No se esta haciendo nada
-	public static final int STATE_LISTEN = 1; // Escuchando por conexiones
-												// entrantes
+	public static final int STATE_LISTEN = 1; // Escuchando por conexiones entrantes
 	public static final int STATE_CONNECTING = 2; // Iniciando conexion saliente
 	public static final int STATE_CONNECTED = 3; // Conectado con un dispositivo
 
 	/**
-	 * Constructor. Prepara una nueva sesion para la conexion Bluetooth
-	 * Smartphone - Arduino
+	 * Constructor. Prepara una nueva sesion para la conexion Bluetooth Smartphone - MOTORDROID
 	 * 
 	 * @param context
 	 *            El identificador UI de la actividad de context
@@ -67,10 +65,8 @@ public class ControlBT {
 	 */
 	private synchronized void setState(int estado) {
 		EstadoActual = estado;
-		// Le enviamos al Handler el nuevo estado actual para que se actualize
-		// en la Actividad
-		mHandler.obtainMessage(Motordroid.Mensaje_Estado_Cambiado, estado, -1)
-				.sendToTarget();
+		// Le enviamos al Handler el nuevo estado actual para que se actualize en la Actividad
+		mHandler.obtainMessage(Motordroid.Mensaje_Estado_Cambiado, estado, -1).sendToTarget();
 	}
 
 	/**
@@ -81,12 +77,12 @@ public class ControlBT {
 	}
 
 	/**
-	 * Inicia el servicio bluetooth. Especificamente inicia el HiloAceptacion
+	 * Inicia el servicio bluetooth. Especificamente inicia el HILO ACEPTACIÓN
 	 * para iniciar el modo de "escucha". LLamado por la Actividad onResume()
 	 */
 	public synchronized void start() {
 		if (D)
-			Log.e(TAG, "start");
+			Log.e(TAG, "START");
 
 		// Cancela cualquier hilo que quiera hacer una conexion
 		if (HiloDeConexion != null) {
@@ -109,15 +105,14 @@ public class ControlBT {
 	}
 
 	/**
-	 * Inicia el HiloConectado para iniciar la conexion con un dispositivo
-	 * remoto
+	 * Inicia el HILO CONECTADO para iniciar la conexion con un dispositivo remoto
 	 * 
 	 * @param device
 	 *            -->El dispositivo BT a conectar
 	 */
 	public synchronized void connect(BluetoothDevice device) {
 		if (D)
-			Log.e(TAG, "Conectado con: " + device);
+			Log.e(TAG, "CONECTADO CON: " + device);
 
 		// Cancela cualquier hilo que intente realizar una conexion
 		if (EstadoActual == STATE_CONNECTING) {
@@ -140,17 +135,15 @@ public class ControlBT {
 	}
 
 	/**
-	 * Inicia el hilo Conectado para iniciar la administracion de la conexion BT
+	 * Inicia el HILO CONECTADO para iniciar la administracion de la conexion BT
 	 * 
 	 * @param socket
 	 *            El socket BT donde se realizara la conexion
 	 * @param device
 	 *            El dispositivo BT con que se conectara
 	 */
-	public synchronized void connected(BluetoothSocket socket,
-			BluetoothDevice device) {
-		if (D)
-			Log.e(TAG, "connected");
+	public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
+		Log.e("CONFIGURACION", "CONECTADO");
 
 		// Cancela el hilo que completo la conexion
 		if (HiloDeConexion != null) {
@@ -164,8 +157,7 @@ public class ControlBT {
 			HiloConetado = null;
 		}
 
-		// Cancela el hilo aceptacion debido a que solo queremos conectarnos con
-		// Arduino
+		// Cancela el hilo aceptacion debido a que solo queremos conectarnos con MOTORDROID
 		if (HiloAceptacion != null) {
 			HiloAceptacion.cancel();
 			HiloAceptacion = null;
@@ -176,8 +168,7 @@ public class ControlBT {
 		HiloConetado.start();
 
 		// Envia el nombre del dispositivo conectado de vuelta
-		Message msg = mHandler
-				.obtainMessage(Motordroid.Mensaje_Nombre_Dispositivo);
+		Message msg = mHandler.obtainMessage(Motordroid.Mensaje_Nombre_Dispositivo);
 		Bundle bundle = new Bundle();
 		bundle.putString(Motordroid.DEVICE_NAME, device.getName());
 		msg.setData(bundle);
@@ -192,7 +183,7 @@ public class ControlBT {
 	 */
 	public synchronized void stop() {
 		if (D)
-			Log.e(TAG, "stop");
+			Log.e(TAG, "STOP");
 		if (HiloDeConexion != null) {
 			HiloDeConexion.cancel();
 			HiloDeConexion = null;
@@ -209,7 +200,7 @@ public class ControlBT {
 	}
 
 	/**
-	 * Escribe en el HiloConectado de manera Asincrona
+	 * Escribe en el HILO CONECTADO de manera Asincrona
 	 * 
 	 * @param out
 	 *            Los bytes a escribir
@@ -236,7 +227,7 @@ public class ControlBT {
 		// Envia un mensaje de falla de vuelta a la actividad
 		Message msg = mHandler.obtainMessage(Motordroid.Mensaje_TOAST);
 		Bundle bundle = new Bundle();
-		bundle.putString(Motordroid.TOAST, "Error de conexion");
+		bundle.putString(Motordroid.TOAST, "ERROR DE CONEXIÓN");
 		msg.setData(bundle);
 		mHandler.sendMessage(msg);
 	}
@@ -250,7 +241,7 @@ public class ControlBT {
 		// Envia un mensaje de falla de vuelta a la actividad
 		Message msg = mHandler.obtainMessage(Motordroid.Mensaje_TOAST);
 		Bundle bundle = new Bundle();
-		bundle.putString(Motordroid.TOAST, "Se perdio conexion");
+		bundle.putString(Motordroid.TOAST, "CONEXIÓN PERDIDA");
 		msg.setData(bundle);
 		mHandler.sendMessage(msg);
 		msg = mHandler.obtainMessage(Motordroid.MESSAGE_Desconectado);
@@ -260,7 +251,7 @@ public class ControlBT {
 
 	/**
 	 * Este hilo corre mientras se este ESCUCHANDO por conexiones entrantes.
-	 * Este se comporta como el lado-Servidor cliente. Corre mientras la
+	 * Este se comporta como el lado Servidor-cliente. Corre mientras la
 	 * conexion es aceptada(o cancelada)
 	 */
 	private class AcceptThread extends Thread {
@@ -280,8 +271,7 @@ public class ControlBT {
 		}
 
 		public void run() {
-			if (D)
-				Log.e(TAG, "Comenzar HiloDeAceptacion " + this);
+			Log.e(TAG, "COMIENZO HILO ACEPTACION " + this);
 			setName("HiloAceptado");
 			BluetoothSocket socket = null;
 			// Escucha al server socket si no estamos conectados
@@ -320,7 +310,7 @@ public class ControlBT {
 				}
 			}
 			if (D)
-				Log.e(TAG, "Fin de Hilo Aceptacion");
+				Log.e(TAG, "FIN HILO ACEPTACIÓN");
 		}
 
 		public void cancel() {
@@ -329,7 +319,7 @@ public class ControlBT {
 			try {
 				mmServerSocket.close();
 			} catch (IOException e) {
-				Log.e(TAG, "close() del servidor FAllo", e);
+				Log.e(TAG, "close() del servidor Fallo", e);
 			}
 		}
 	}
@@ -357,7 +347,7 @@ public class ControlBT {
 		}
 
 		public void run() {
-			Log.e(TAG, "Comenzando Hilo Conectada");
+			Log.e(TAG, "COMIENZO HILO CONECTADO");
 			setName("HiloConectado");
 			// Siempre cancela la busqueda debido a que esta hara lenta la
 			// conexion
@@ -409,7 +399,7 @@ public class ControlBT {
 		private final OutputStream OUTPUT_Stream;
 
 		public ConnectedThread(BluetoothSocket socket) {
-			Log.d(TAG, "Creacion de Hilo Conectado");
+			Log.d(TAG, "CREACIÓN HILO CONECTADO");
 			BTSocket = socket;
 			InputStream tmpIn = null;
 			OutputStream tmpOut = null;
@@ -450,7 +440,7 @@ public class ControlBT {
 		}
 
 		public void run() {
-			Log.e(TAG, "Comenzar Hilo Conectado");
+			Log.e(TAG, "COMIENZO HILO CONECTADO");
 			byte[] buffer = new byte[1024];
 			int bytes;
 
